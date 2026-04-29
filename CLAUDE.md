@@ -56,10 +56,13 @@ Flask API  (web/app.py)
   ├── POST /api/v1/sync        → async ETL trigger (202 Accepted)
   └── POST /api/v1/qa          → natural-language Q&A
   ↓
-React Dashboard
+React Dashboard  (react-router-dom, 4 pages)
+  ├── AppShell  (persistent nav, sync button, chat widget)
+  ├── / HomePage → overview KPIs + nav tiles
+  ├── /invoices, /customers, /trends → dedicated analytics pages
   ├── Recharts charts (pure-props, no fetch inside chart components)
   ├── TanStack Query hooks  (features/dashboard/hooks/useMetrics.ts)
-  └── WarehouseChatWidget  (multi-turn Q&A panel)
+  └── WarehouseChatWidget  (multi-turn Q&A panel, persists across pages)
 ```
 
 ### Backend Key Modules
@@ -78,11 +81,18 @@ React Dashboard
 
 | Path | Purpose |
 |---|---|
-| `src/lib/api.ts` | Typed fetch helpers, `VITE_API_BASE_URL` config, error class |
+| `src/App.tsx` | Router root — `BrowserRouter` + layout route + 4 page routes |
+| `src/components/layout/AppShell.tsx` | Persistent shell: sticky header, top nav, sync button, chat widget, `<Outlet>` |
+| `src/features/home/HomePage.tsx` | `/` — 6 KPI overview cards + 3 nav tiles |
+| `src/features/invoices/InvoicesPage.tsx` | `/invoices` — 4 invoice charts |
+| `src/features/customers/CustomersPage.tsx` | `/customers` — 4 customer charts + overdue table |
+| `src/features/trends/TrendsPage.tsx` | `/trends` — payments by month + allocations summary |
 | `src/features/dashboard/hooks/useMetrics.ts` | TanStack Query hooks, one per API endpoint |
-| `src/features/dashboard/DashboardPage.tsx` | Composes all metric sections |
+| `src/features/dashboard/WarehouseChatWidget.tsx` | Floating AI Q&A panel — rendered in AppShell, persists across pages |
+| `src/components/dashboard/` | Shared helpers: `ChartCard`, `KpiCard`, `KpiSkeleton`, `BlockError`, `ChartEmpty`, `SectionHeader`, `Stat` |
 | `src/components/charts/` | Pure Recharts wrappers (receive data as props only) |
 | `src/components/ui/` | shadcn/ui primitives — add new ones via `npx shadcn@latest add <component>` |
+| `src/lib/api.ts` | Typed fetch helpers, `VITE_API_BASE_URL` config, error class |
 
 ### Database Schema (Supabase Postgres)
 
