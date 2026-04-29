@@ -1,0 +1,84 @@
+name: Merge to Main
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  frontend-security-audit:
+    name: Frontend — npm audit
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: quickbooks-dataengineering-frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: quickbooks-dataengineering-frontend/package-lock.json
+
+      - run: npm ci
+      # Fail on high/critical vulnerabilities only
+      - run: npm audit --audit-level=high
+
+  backend-security-audit:
+    name: Backend — pip-audit
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: quickbooks-dataengineering-pipeline
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: quickbooks-dataengineering-pipeline/requirements.txt
+
+      - run: pip install pip-audit
+      - run: pip-audit -r requirements.txt
+
+  migration-lint:
+    name: Migration safety lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Check for destructive SQL in new migrations
+        run: |
+          # Fail if any newly added migration contains DROP TABLE/COLUMN or TRUNCATE
+          git diff HEAD~1 HEAD -- 'supabase/migrations/*.sql' | \
+            grep -iE '^\+.*(DROP\s+TABLE|DROP\s+COLUMN|TRUNCATE)' && \
+            { echo "Destructive SQL detected in migration. Review before merging."; exit 1; } || \
+            echo "No destructive SQL found."
+
+  frontend-prod-build:
+    name: Frontend — production build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: quickbooks-dataengineering-frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: quickbooks-dataengineering-frontend/package-lock.json
+
+      - run: npm ci
+      - run: npm run build
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist-main
+          path: quickbooks-dataengineering-frontend/dist/
+          retention-days: 30
