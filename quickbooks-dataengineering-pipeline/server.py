@@ -31,4 +31,8 @@ app = create_app()
 if __name__ == "__main__":
     port = int(os.getenv("PORT", "5050"))
     debug = os.getenv("FLASK_DEBUG", "").strip().lower() in ("1", "true", "yes")
-    app.run(host=os.getenv("FLASK_HOST", "127.0.0.1"), port=port, debug=debug)
+    # Platforms like Render set PORT and require binding 0.0.0.0 so traffic reaches the app.
+    # Local runs without PORT keep the safer 127.0.0.1 default.
+    default_host = "0.0.0.0" if os.getenv("PORT") is not None else "127.0.0.1"
+    host = os.getenv("FLASK_HOST", default_host)
+    app.run(host=host, port=port, debug=debug)
