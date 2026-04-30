@@ -1,78 +1,42 @@
-Create a separate git branch for each tier of the stacked PR plan.
+# Command: /split-branches
 
-## Branch Naming Convention
+## Purpose
+Split current work into tiered branches for stacked PR workflow.
 
-`<type>/<feature-name>/<tier>`
+## When to Use
+Use after implementation is complete and a split plan is ready.
 
-- **type** — `feat`, `fix`, `chore`, `refactor` (conventional commits style)
-- **feature-name** — kebab-case, derived from the spec file name or current branch
-- **tier** — `interface`, `core`, `helpers`, `integration`
+## Inputs
+- Current diff: `git diff main...HEAD`
+- Feature name from spec or current branch
 
-Examples:
-```
-feat/customer-aging/interface
-feat/customer-aging/core
-feat/customer-aging/helpers
-feat/customer-aging/integration
-```
+## Instructions
+1. Use naming convention `<type>/<feature-name>/<tier>`
+   - `type`: `feat`, `fix`, `chore`, `refactor`
+   - `tier`: `interface`, `core`, `helpers`, `integration`
+2. Generate file-to-tier mapping:
+   - interface: types/contracts/signatures/migrations
+   - core: business logic, ETL, SQL, routes, pages
+   - helpers: utilities, validators, formatters, shared hooks/config
+   - integration: wiring and tests
+3. Print mapping and ask for confirmation (`Proceed? y/n`)
+4. Do not create branches until user confirms.
+5. Save original branch:
+   - `ORIGINAL=$(git branch --show-current)`
+6. For each populated tier in order (interface -> core -> helpers -> integration):
+   - Create branch from `main`.
+   - Check out tier files from `$ORIGINAL`.
+   - Commit with `feat(<name>): <tier> layer`.
+7. Return to `$ORIGINAL`
 
-## Sequence
-
-### 1. Run split-pr analysis
-Analyze `git diff main...HEAD` to produce a file-to-tier mapping:
-
-- **interface** — type definitions, route/component signatures, API contracts, migration files
-- **core** — main logic: ETL stages, SQL functions, Flask routes, React pages
-- **helpers** — utilities, formatters, validators, shared hooks, config changes
-- **integration** — wiring between layers, end-to-end connections, all test files
-
-### 2. Confirm the plan
-Print the mapping before creating any branches. Wait for user confirmation:
-
-```
-Branch plan for feat/<name>:
-
-  interface   → types/metrics.ts, web/app.py (route signatures only)
-  core        → etl/load.py, warehouse/analytics_queries.py, pages/CustomersPage.tsx
-  helpers     → lib/format.ts, validate.py
-  integration → tests/test_load.py, tests/test_api.py, App.tsx (route wiring)
-
-Proceed? (y/n)
-```
-
-Do not create any branches until the user confirms.
-
-### 3. Record the current branch
-```
-ORIGINAL=$(git branch --show-current)
-```
-
-### 4. Create each tier branch
-For each tier that has files assigned (in order: interface → core → helpers → integration):
-```
-git checkout main
-git checkout -b feat/<name>/<tier>
-git checkout $ORIGINAL -- <file1> <file2> ...
-git add .
-git commit -m "feat(<name>): <tier> layer"
-```
-
-Omit tiers with no files.
-
-### 5. Return to original branch
-```
-git checkout $ORIGINAL
-```
-
-### 6. Report
-```
+## Output Format
+```text
 --- BRANCHES CREATED ---
-  feat/<name>/interface   — 3 files
-  feat/<name>/core        — 5 files
-  feat/<name>/helpers     — 2 files
-  feat/<name>/integration — 4 files
+  feat/<name>/interface   - <N files>
+  feat/<name>/core        - <N files>
+  feat/<name>/helpers     - <N files>
+  feat/<name>/integration - <N files>
 
 Original branch: <name> (unchanged)
-
 Next: run /push-stack to push all branches to remote
 ```

@@ -1,62 +1,44 @@
-Check CI status for all branches in the current feature stack, or a single branch if specified.
+# Command: /check-ci
 
-## Usage
-- No argument: checks all `feat/<current-feature>/*` branches in the stack
-- With a branch name argument: checks only that branch
+## Purpose
+Check CI status across a feature stack or a single branch.
 
-## Sequence
+## When to Use
+Use after pushing branches and while waiting for merge readiness.
 
-### 1. Identify branches to check
-Derive the feature name from the current branch (strip the tier suffix if present).
-Run: `git branch -r --list "origin/feat/<name>/*"` to list all remote tier branches.
-If no stack branches found: fall back to checking the current branch only.
+## Inputs
+- Optional branch name argument
+- Current branch context (for deriving feature name)
 
-### 2. For each branch, find its open PR (if any)
-Use the GitHub MCP tool `mcp__github__list_pull_requests` with:
-- owner: `UMAIRAHMED-111`
-- repo: `quickbooks-project`
-- state: `open`
-- head: `UMAIRAHMED-111:<branch-name>`
+## Instructions
+1. Identify branches:
+   - No arg: check all `origin/feat/<name>/*` branches
+   - With arg: check only that branch
+   - If no stack branches found, fall back to current branch
+2. For each branch, find open PR:
+   - Query open PR by head branch
+3. Evaluate CI status:
+   - If PR exists, inspect PR status checks
+   - If no PR, run `gh run list --branch <branch> --limit 5`
+4. Map status values:
+   - success -> [PASS]
+   - pending/in_progress/queued -> [PENDING]
+   - failure/error -> [FAIL] (include failure snippet)
+   - no runs -> [NO DATA]
+5. Provide overall verdict:
+   - READY TO MERGE / WAITING / BLOCKED / NO CI DATA
 
-### 3. Evaluate CI status per branch
-
-**If a PR exists** → use `mcp__github__get_pull_request_status` with the PR number.
-The response contains a `statuses` array and a `state` field (`success`, `failure`, `pending`, `error`).
-Map each status check's `context` and `state` to the output table.
-
-**If no PR exists** → fall back to:
-```
-gh run list --branch <branch> --limit 5
-```
-Report based on the most recent run per workflow name.
-
-### 4. Evaluate each status
-
-- `success` → ✅
-- `pending` / `in_progress` / `queued` → ⏳
-- `failure` / `error` → ❌  fetch failure details: `gh run view <run-id> --log-failed` (last 30 lines)
-- no runs at all → ⚠️ no CI data — workflows may not have triggered (check branch filter in .github/workflows/)
-
-### 5. Output
-
-```
+## Output Format
+```text
 --- CI STATUS ---
 
-feat/<name>/interface   ✅ Backend CI  ✅ Frontend CI   (PR #N)
-feat/<name>/core        ✅ Backend CI  ⏳ Frontend CI   (PR #N)
-feat/<name>/helpers     ❌ Backend CI  ✅ Frontend CI   (PR #N)
-feat/<name>/integration ⚠️ no CI data                  (no PR)
+feat/<name>/interface   [PASS] Backend CI  [PASS] Frontend CI   (PR #N)
+feat/<name>/core        [PASS] Backend CI  [PENDING] Frontend CI   (PR #N)
+feat/<name>/helpers     [FAIL] Backend CI  [PASS] Frontend CI   (PR #N)
+feat/<name>/integration [NO DATA] no CI data                    (no PR)
 
-Overall: BLOCKED — fix failure on helpers before merging
+Overall: BLOCKED - fix failure on helpers before merging
 
 --- Failure: feat/<name>/helpers / Backend CI ---
-FAILED tests/test_validate.py::test_amount_required
-AssertionError: expected ValidationError, got None
-<last 30 lines of failing step output>
+<last 30 lines of failing output>
 ```
-
-**Overall verdict:**
-- **READY TO MERGE** — all PRs, all checks green
-- **WAITING** — checks still running → re-run `/check-ci` in a few minutes
-- **BLOCKED** — at least one failure → fix, push the affected branch, re-run `/check-ci`
-- **NO CI DATA** — workflows haven't fired → verify branch filters in `.github/workflows/`, or open PRs to trigger the `pull_request` event

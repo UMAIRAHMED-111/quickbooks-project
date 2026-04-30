@@ -1,68 +1,34 @@
-Create PRs from all tier branches to main. All PRs target main independently.
+# Command: /open-prs
 
-## Pre-flight
+## Purpose
+Create PRs for all tier branches targeting `main`.
 
-**Verify CI is green:**
-Run `gh run list --branch feat/<name>/<tier> --limit 3` for each tier branch.
-If any branch has failing or in-progress CI: print the status and ask the user to confirm before continuing. Do not silently proceed.
+## When to Use
+Use after `/push-stack` and once CI is acceptable for each tier branch.
 
-## Find the spec
-Check `.claude/specs/` for a spec file matching the current feature name.
-Read it to extract: feature name, goal, and acceptance criteria.
+## Inputs
+- Tier branches: `feat/<name>/<tier>`
+- Spec file in `.claude/specs/`
 
-## For each tier branch (interface → core → helpers → integration)
+## Instructions
+1. Pre-flight:
+   - Check CI per tier with `gh run list --branch feat/<name>/<tier> --limit 3`
+   - If failing/in-progress checks exist, show status and request user confirmation before continuing
+2. Read matching spec:
+   - Extract feature name, goal, and acceptance criteria
+3. For each tier in order (interface -> core -> helpers -> integration):
+   - Build title: `feat(<name>): <tier> - <short description>` (under 70 chars).
+   - Build PR body with:
+     - What this does
+     - Stack table
+     - Acceptance criteria covered
+     - Spec link/path
+   - Create PR via `gh pr create --base main --head feat/<name>/<tier> ...`
+4. Update stack references with PR numbers as PRs are created
+5. Return all PR URLs
 
-### 1. Build the PR title
-Format: `feat(<name>): <tier> — <short description>`
-Under 70 characters. Examples:
-- `feat(customer-aging): interface — types and route contract`
-- `feat(customer-aging): core — aging SQL + Flask endpoint`
-
-### 2. Build the PR body
-
-```markdown
-## What this does
-- <1–3 bullets specific to what this tier contributes>
-
-## Stack
-| Branch | PR | Status |
-|---|---|---|
-| `feat/<name>/interface` | #<pr> | ⏳ open |
-| `feat/<name>/core`      | #<pr> | ⏳ open |
-| `feat/<name>/helpers`   | #<pr> | ⏳ open |
-| `feat/<name>/integration` | #<pr> | ⏳ open |
-
-Merge order: interface → core → helpers → integration.
-
-## Acceptance criteria
-(criteria this tier satisfies)
-- [ ] <criterion from spec>
-
-## Spec
-`.claude/specs/<name>.md`
-
-🤖 Generated with [Claude Code](https://claude.com/claude-code)
-```
-
-Fill in PR numbers as each PR is created (update previous PRs' bodies if needed).
-
-### 3. Create the PR
-```
-gh pr create \
-  --base main \
-  --head feat/<name>/<tier> \
-  --title "<title>" \
-  --body "$(cat <<'EOF'
-<body>
-EOF
-)"
-```
-
-Repeat for each tier. Collect the PR URLs as you go.
-
-## Final Report
-
-```
+## Output Format
+```text
 --- PRs CREATED ---
   interface:   https://github.com/.../pull/42
   core:        https://github.com/.../pull/43
@@ -70,6 +36,6 @@ Repeat for each tier. Collect the PR URLs as you go.
   integration: https://github.com/.../pull/45
 
 All PRs target main.
-Merge order: interface → core → helpers → integration.
+Merge order: interface -> core -> helpers -> integration.
 After each merge, GitHub will auto-update the remaining open PRs.
 ```

@@ -1,26 +1,39 @@
-Explain the code clearly and concisely. Keep it tight — no padding, no restating obvious things, no over-explaining simple lines.
+# Command: /explain
 
-Always use this exact structure:
+## Purpose
+Explain code clearly and concisely.
 
+## When to Use
+Use when a user asks what a snippet, file, function, or flow does.
+
+## Inputs
+- Code snippet, file path, or symbol
+- Optional scope request (specific part vs full walkthrough)
+
+## Instructions
+- Keep it tight: no padding, no filler, no restating obvious lines.
+- If asked about a specific part, explain only that part.
+- Do not explain language basics the user clearly knows.
+- Group related steps; do not bullet every single line.
+- Do not add a redundant summary after `What it does`.
+- Scale depth to input size:
+  - **Small (<30 lines):** 2-4 bullets, skip obvious steps
+  - **Medium (30-150 lines):** main flow + non-obvious parts
+  - **Large (150+ lines) / full walkthrough:** section-by-section, still concise
+
+## Output Format
+```markdown
 ---
 
-**What it does:** [one sentence — the top-level purpose]
+**What it does:** <one sentence>
 
 **How it works:**
-- [key step or concept 1]
-- [key step or concept 2]
-- [key step or concept 3, etc.]
+- <key step or concept 1>
+- <key step or concept 2>
+- <key step or concept 3>
 
-**Worth noting:** *(optional — only include if there's something non-obvious: a gotcha, a side effect, an assumption, a dependency)*
-- [non-obvious detail]
+**Worth noting:** *(optional)*
+- <non-obvious detail, gotcha, side effect, or assumption>
 
 ---
-
-Scale to what's shared and asked:
-- **Small snippet (<30 lines)**: 2–4 bullet points, skip obvious steps
-- **Medium (30–150 lines)**: cover the main flow and any non-obvious parts
-- **Large (150+ lines) or "walk me through everything"**: go section by section, but still keep each point tight
-
-If the user asks about a specific part, explain only that.
-
-Do not explain language basics the user clearly already knows. Do not bullet every single line — group related steps. Do not add a "summary" that repeats "What it does". No filler phrases.
+```
