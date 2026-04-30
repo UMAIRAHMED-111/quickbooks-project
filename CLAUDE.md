@@ -146,12 +146,18 @@ Full details → `.claude/knowledge/config.md`
 Full lifecycle for every feature. Detailed map → `.claude/knowledge/workflow.md`
 
 ```
+0. START       /standup → recent commits + open specs + next suggestion
+               /estimate → scope + risks + PR split before writing any code
 1. INTAKE      /new-feature → spec saved to .claude/specs/<name>.md
 2. PLANNING    Plan mode → Claude reads spec + codebase, flags gaps
 3. BUILD       spec-follower checks off criteria · frontend-development · feature-request
+               Hooks auto-format every write (ruff / prettier) and validate on every stop
 4. ITERATE     debug → refactor → /review → /docs-standards-review
 5. SHIP        /ship → tests + lint + review + update-kb + PR split plan
-6. PR          Stacked PRs: Interface → Core → Helpers → Integration+Tests
+6. SPLIT       /split-branches → create feat/<name>/interface, /core, /helpers, /integration
+7. PUSH        /push-stack → rebase all tier branches onto main, push to remote
+8. CI          /check-ci → monitor GitHub Actions for all tier branches, show failures inline
+9. PR          /open-prs → create one PR per tier, all targeting main, with stack table in body
 ```
 
 ---
@@ -176,8 +182,14 @@ Full lifecycle for every feature. Detailed map → `.claude/knowledge/workflow.m
 
 | Type | Name | Trigger |
 |---|---|---|
+| Command | `/standup` | Session start — recent commits, open specs, next steps |
+| Command | `/estimate` | Pre-implementation — scope, risks, PR split |
 | Command | `/new-feature` | Start a feature — creates spec in `.claude/specs/` |
 | Command | `/ship` | Pre-PR — runs all checks, outputs split plan |
+| Command | `/split-branches` | Create tier branches: `feat/<name>/interface\|core\|helpers\|integration` |
+| Command | `/push-stack` | Rebase all tier branches onto main and push to remote |
+| Command | `/check-ci` | Check GitHub Actions CI for all tier branches; shows failures inline |
+| Command | `/open-prs` | Create one PR per tier, all targeting main, with stack table in body |
 | Command | `/review` | Structured code review |
 | Command | `/docs-standards-review` | Documentation and coding standards review |
 | Command | `/explain` | Code explanation |

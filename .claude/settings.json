@@ -18,7 +18,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "jq -r '.tool_input.file_path // empty' | { read -r f; if [ -n \"$f\" ]; then case \"$f\" in *.py) ruff format \"$f\" 2>/dev/null && echo \"ruff: formatted $f\" ;; *.ts|*.tsx) cd \"/Users/umairahmed/Desktop/Personal Projects/quickbooks-project/quickbooks-dataengineering-frontend\" && npx prettier --write \"$f\" 2>/dev/null && echo \"prettier: formatted $f\" ;; esac; fi; } || true",
+            "command": "jq -r '.tool_input.file_path // empty' | { read -r f; if [ -n \"$f\" ]; then case \"$f\" in *.py) if ruff format \"$f\" 2>/dev/null; then jq -cn --arg m \"ruff: formatted $f\" '{systemMessage: $m}'; fi ;; *.ts|*.tsx) if cd \"/Users/umairahmed/Desktop/Personal Projects/quickbooks-project/quickbooks-dataengineering-frontend\" && npx prettier --write \"$f\" 2>/dev/null; then jq -cn --arg m \"prettier: formatted $f\" '{systemMessage: $m}'; fi ;; esac; fi; } 2>/dev/null || true",
             "timeout": 30
           }
         ]
