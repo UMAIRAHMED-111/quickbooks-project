@@ -48,15 +48,18 @@ main.py                          # CLI entry point — one-shot ETL sync
 ask.py                           # CLI entry point — natural-language Q&A
 repo_bootstrap.py                # Loads .env; adds src/ to sys.path
 
+airflow/dags/
+  qbo_n8n_sync_dag.py            # Airflow DAG: 6-task ETL pipeline (see below)
+
 src/qbo_pipeline/
   config.py                      # Settings + WarehouseQaConfig dataclasses
   observability.py               # Shared structured logger
   db/pool.py                     # ThreadedConnectionPool (max 15 connections)
   etl/
     pipeline.py                  # Orchestrator: extract→transform→validate→load
-    extract.py                   # HTTP fetch from n8n or local JSON file
+    extract.py                   # HTTP fetch from n8n or local file; fetch_webhook_to_tempfile for Airflow
     transform.py                 # Normalizes raw QBO payload to canonical rows
-    validate.py                  # Field + business rule validation
+    validate.py                  # Field + business rule validation; validate_bundle() used by Airflow
     load.py                      # Transactional upsert by qbo_id to Postgres
     run.py                       # Thin wrapper used by CLI and Flask route
   web/app.py                     # Flask routes + CORS + auth + async sync thread
@@ -74,6 +77,19 @@ src/qbo_pipeline/
 
 tests/                           # pytest — runs against real Postgres service container
 ```
+
+### Airflow DAG Task Graph
+
+```
+fetch_n8n_json        — calls fetch_webhook_to_tempfile(); saves raw JSON to temp path; returns path
+  → extract_payload   — calls extract() with local_path; saves extracted JSON to new temp path; deletes input
+  → transform_payload — calls transform(); serializes LoadBundle to temp JSON; deletes input
+  → validate_payload  — calls validate_bundle(); returns bundle_path unchanged (no-op on success)
+  → load_warehouse    — calls load(); writes to Postgres; deletes bundle temp file; returns sync_id
+  → post_load_checks  — queries sync_runs WHERE id=sync_id; asserts status=success and counts ≥ 0
+```
+
+Temp files are used as XCom hand-offs between tasks (Airflow XCom only passes strings). Each stage deletes its input artifact in a `finally` block.
 
 ## Data Flow
 

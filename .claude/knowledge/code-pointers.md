@@ -85,6 +85,17 @@ git commit -m "feat(<name>): <tier> layer"
 - Return to the original branch with `git checkout <source-branch>` when done
 - Use `git branch --list "feat/<name>/*"` to verify all tiers were created
 
+## Modifying the Airflow DAG
+
+The Airflow DAG lives at `quickbooks-dataengineering-pipeline/airflow/dags/qbo_n8n_sync_dag.py`.
+
+- **Add a new ETL stage:** create a new `@task` function and wire it into the task chain at the bottom of `qbo_n8n_sync()`
+- **Change stage logic:** edit the corresponding `@task` directly; each stage reads a JSON temp file from the previous stage and writes a new one
+- **Change the source of raw data:** modify `fetch_n8n_json` (which calls `fetch_webhook_to_tempfile` from `extract.py`)
+- **Change validation rules:** edit `validate_bundle()` in `validate.py` — Airflow calls it unchanged
+- **Change post-load checks:** edit `post_load_checks` task — it queries `sync_runs` directly via `pooled_connection`
+- **Temp file hand-off:** all inter-task data passes as a string (file path) via XCom; each task deletes its input artifact in a `finally` block
+
 ## Adding a lazy-loaded page route
 
 When adding a new page to `App.tsx`, use `React.lazy()` to keep it out of the main bundle:

@@ -33,13 +33,32 @@ Started as a QuickBooks Online (QBO) data engineering pipeline to sync invoice, 
 
 ### 6 — Claude Code workflow infrastructure (`claude-dev`)
 - Full development lifecycle tooling added to `.claude/`:
-  - 7 skills: `spec-creator`, `spec-follower`, `debug`, `refactor`, `feature-request`, `frontend-development`, `split-pr`
+  - 4 skills: `spec-creator`, `debug`, `refactor`, `frontend-development` (active; `spec-follower`, `split-pr`, `feature-request` removed)
   - 12 commands: `/standup`, `/estimate`, `/new-feature`, `/ship`, `/split-branches`, `/push-stack`, `/check-ci`, `/open-prs`, `/review`, `/docs-standards-review`, `/explain`, `/update-kb`
   - 7 knowledge files: `workflow.md`, `codebase.md`, `code-pointers.md`, `decisions.md`, `history.md`, `config.md`, `gatekeeping.md`
   - Hooks: PostToolUse auto-formats `.py` (ruff) and `.ts`/`.tsx` (prettier) with visible `systemMessage` output; Stop hook auto-validates build + tests
 - React.lazy() added to `App.tsx` — page routes are now code-split, main bundle dropped from 776 kB to 289 kB
 - Branch convention established: `feat/<feature>/<tier>` with all tiers targeting main independently
 
+### 7 — CI branch filters + check-ci via GitHub MCP (`c753131`)
+- `frontend-ci.yml` and `backend-ci.yml` workflows gained branch filters — CI now only triggers on relevant branch patterns, reducing noise
+- `/check-ci` command refactored to use GitHub MCP (`mcp__github__*` tools) instead of `gh` CLI for CI status queries
+- `push-stack.md` and `workflow.md` updated with detailed guidance on local-only dev branch handling (rebasing tier branches onto `claude-dev` tip before push)
+
+### 8 — New commands: `/final-validation-pass`, `/test-case-create`, `/plan-mode`, `/spec-review` (`c0afd35`, `e40c965`)
+- `/final-validation-pass` — critical pre-ship validation analysis; blocks shipping if any acceptance criteria gap is found
+- `/test-case-create` — generates a comprehensive test case plan from a spec; saves to `.claude/specs/<name>-tests.md`
+- `/plan-mode` — drops Claude into plan mode to review spec + codebase before writing code
+- `/spec-review` — structured review of a spec file for completeness, ambiguity, and missing edge cases
+- All existing command docs (`/standup`, `/estimate`, `/new-feature`, `/ship`, etc.) refactored for clarity and consistency
+
+### 9 — Airflow DAG refactor: explicit ETL stages (`e4dd5c6`)
+- `qbo_n8n_sync_dag.py` rebuilt with 6 explicit Airflow tasks:
+  `fetch_n8n_json → extract_payload → transform_payload → validate_payload → load_warehouse → post_load_checks`
+- Temp files passed between tasks for data integrity (each stage writes a JSON artifact; next stage consumes + deletes it)
+- `fetch_webhook_to_tempfile()` added to `extract.py` — fetches n8n webhook and saves raw JSON to a temp path for Airflow XCom hand-off
+- `post_load_checks` task queries `sync_runs` directly to validate status and counts are non-negative after every run
+- Structured logging via `observability.py` at each stage
+
 ## Current Branch
-`claude-dev` — active development branch. PRs target `main`.
-Stacked PR branches ready to push: `feat/qbo-dashboard/interface`, `/core`, `/helpers`, `/integration`.
+`claude-dev` — active development branch. PRs target `main`. Local-only; never pushed to remote.

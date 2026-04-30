@@ -46,9 +46,9 @@ Review the spec in plan mode before writing any code.
 Build against the spec. Criteria are checked off as work is completed.
 
 **Auto-triggered skills:**
-- `spec-follower` — triggered by "implement the spec"; reads `.claude/specs/*.md`, implements step by step, checks off criteria
 - `frontend-development` — triggered by any React/UI work
-- `feature-request` — triggered by "add X to", "change this", "modify"; assesses impact before touching anything
+- `debug` — triggered by "fix this", "why is X broken", "getting an error"
+- `refactor` — triggered by "clean this up", "simplify", "without changing behavior"
 
 **Hooks (fire automatically, announce themselves):**
 - `PostToolUse` on Write/Edit → `ruff format` on `.py`, `prettier` on `.ts`/`.tsx`; surfaces "ruff: formatted <file>" in the UI
@@ -174,21 +174,22 @@ Creates one PR per tier, all targeting `main`. Includes in each body:
 | 0 — Session start | `/estimate` | Command | User-invoked |
 | 1 — Intake | `/new-feature` | Command | User-invoked |
 | 1 — Intake | `spec-creator` | Skill | Auto — "I want to build X", "create spec" |
-| 3 — Implementation | `spec-follower` | Skill | Auto — "implement the spec" |
+| 2 — Planning | `/plan-mode` | Command | User-invoked — drops into plan mode to review spec |
+| 2 — Planning | `/spec-review` | Command | User-invoked — structured spec completeness review |
 | 3 — Implementation | `frontend-development` | Skill | Auto — any React/UI work |
-| 3 — Implementation | `feature-request` | Skill | Auto — "add X to", "change this" |
 | 3 — Implementation | PostToolUse hook | Hook | Auto — every Write/Edit |
 | 3 — Implementation | Stop hook | Hook | Auto — every session stop |
 | 4 — Iteration | `debug` | Skill | Auto — "fix this", "why is X broken" |
 | 4 — Iteration | `refactor` | Skill | Auto — "clean this up", "simplify" |
 | 4 — Iteration | `/review` | Command | User-invoked |
 | 4 — Iteration | `/docs-standards-review` | Command | User-invoked |
+| 4 — Iteration | `/test-case-create` | Command | User-invoked — generates test plan from spec |
+| 5 — Ship | `/final-validation-pass` | Command | User-invoked — pre-ship criteria gap check |
 | 5 — Ship | `/ship` | Command | User-invoked |
-| 5 — Ship | `split-pr` | Skill | Auto — runs inside `/ship` |
 | 5 — Ship | `/update-kb` | Command | User-invoked / auto inside `/ship` |
 | 6 — PR | `/split-branches` | Command | User-invoked |
 | 6 — PR | `/push-stack` | Command | User-invoked |
-| 6 — PR | `/check-ci` | Command | User-invoked |
+| 6 — PR | `/check-ci` | Command | User-invoked (uses GitHub MCP) |
 | 6 — PR | `/open-prs` | Command | User-invoked |
 | Any | `/explain` | Command | User-invoked |
 
