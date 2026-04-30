@@ -1,0 +1,43 @@
+# Architectural Decisions & Context
+
+## Why n8n for QBO extraction
+QBO's OAuth flow and API rate limits make direct polling complex. n8n handles the webhook/auth layer and returns a normalized `{ customers, invoices, payments }` payload. The pipeline just consumes that shape — it doesn't own QBO auth.
+
+## Why Supabase Postgres (not a managed DWH)
+The dataset is small (a single business's QBO data). A full DWH would be over-engineered. Supabase gives a managed Postgres with connection pooling via the pooler URL, which is what `db/pool.py` uses.
+
+## Why upsert-on-qbo_id everywhere
+ETL reruns must be idempotent. Using `qbo_id` as the upsert key means running the sync 10 times produces the same result as running it once. This was a deliberate choice to make the sync safe to re-trigger from the UI.
+
+## Why two QA modes (snapshot vs dynamic SQL)
+Dynamic SQL is powerful but risky — a bad LLM query could be slow or expose data. The snapshot planner is the safe default: the LLM picks from precomputed packs in `sql_snapshot.py`. Dynamic SQL (`WAREHOUSE_QA_DYNAMIC_SQL=1`) is opt-in and gated behind a read-only AST validator + allowlist in `qa/dynamic_sql.py`.
+
+## Why OpenAI primary + Gemini fallback
+Single LLM dependency is a reliability risk. The fallback is handled transparently in `qa/gemini_retry.py` — callers don't know which provider responded.
+
+## Why TanStack Query (not SWR or raw useEffect)
+TanStack Query was already in the initial scaffold. It handles caching, background refetch, and loading/error states cleanly, which matched the dashboard's polling needs. SWR would have worked too — TQ was the first choice and there's no reason to migrate.
+
+## Why AppShell renders the chat widget (not individual pages)
+The chat widget maintains multi-turn conversation state. If it lived inside a page component, navigating away would unmount it and lose history. Lifting it to `AppShell` (which never unmounts) preserves the conversation across all 4 routes.
+
+## Why 0.0.0.0 only when PORT is set
+Binding to `0.0.0.0` locally is a minor security concern (exposes the API on all network interfaces). Cloud platforms like Render require it because they proxy traffic and set `PORT`. The `if os.getenv("PORT")` check means the behavior is correct in both environments without manual configuration.
+
+## Why CI runs pytest against a real Postgres container (not mocks)
+A real DB was chosen after mock tests passed but prod migration failures went undetected. The backend CI uses a Postgres service container to catch schema/SQL issues early.
+
+## Why the frontend has a `lib/api.ts` abstraction
+All fetch calls are centralized so the base URL (`VITE_API_BASE_URL`) is set in one place, error handling is consistent, and the sync token header is applied uniformly. Raw `fetch` in components would scatter these concerns.
+
+## Why stacked PRs all target main (not each other)
+Chaining PR bases (PR2 targets PR1, PR3 targets PR2) creates a dependency problem: merging PR1 out of order breaks the diff view for all downstream PRs, and GitHub doesn't auto-rebase them. Having every tier branch off main and targeting main independently keeps each PR reviewable in isolation. Reviewers see only the tier's changes, not accumulated diffs. Merge order is documented in the PR body stack table, not enforced by git.
+
+## Why `feat/<feature>/<tier>` branch naming
+Grouping by feature-then-tier (`feat/customer-aging/core`) keeps all branches for a feature visually adjacent in the branch list, makes the stack immediately obvious from the branch name alone, and follows conventional-commits type prefixes so tooling (changelogs, CI filters) can parse them.
+
+## Why `claude-dev` is local-only and never pushed to remote
+`claude-dev` is the rolling integration branch where day-to-day work accumulates. Publishing it to remote creates ambiguity: PRs, CI, and reviewers would need to treat it differently from the structured `feat/<name>/<tier>` branches. Keeping it local avoids that noise. All publishable work flows through the tier branches, which are properly scoped and individually reviewable. When `/push-stack` detects a local-only working branch with unpublished commits, it automatically rebases the tier branches onto that branch tip so the commits are included in what gets pushed — the dev branch itself never needs to go to remote.
+
+## Why `.claude/commands/` and not `.claude/skills/`
+Commands are user-invoked via `/command-name` in the Claude Code prompt — they're explicit, on-demand operations like `/ship` or `/standup`. Skills are auto-triggered by natural language patterns ("implement the spec", "debug this"). Things that should always require deliberate intent (shipping, PR creation, KB updates) belong in commands. Things that improve an ongoing task invisibly belong in skills.

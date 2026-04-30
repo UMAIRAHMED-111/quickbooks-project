@@ -42,7 +42,9 @@ def connection_pool(conninfo: str) -> ThreadedConnectionPool:
 
 
 @contextmanager
-def pooled_connection(conninfo: str, *, autocommit: bool = False) -> Iterator[extensions.connection]:
+def pooled_connection(
+    conninfo: str, *, autocommit: bool = False
+) -> Iterator[extensions.connection]:
     pool = connection_pool(conninfo)
     conn = pool.getconn()
     conn.autocommit = autocommit

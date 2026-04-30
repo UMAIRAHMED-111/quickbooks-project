@@ -26,6 +26,7 @@ from qbo_pipeline.warehouse.sql_snapshot import (
     PACK_DESCRIPTIONS,
     fetch_warehouse_summary,
 )
+
 logger = get_logger(__name__)
 
 _PLANNER_SYSTEM = """You pick which read-only SQL summary sections are needed to answer a QuickBooks warehouse question.

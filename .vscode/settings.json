@@ -1,4 +1,15 @@
 {
   "typescript.tsdk": "quickbooks-dataengineering-frontend/node_modules/typescript/lib",
-  "typescript.enablePromptUseWorkspaceTsdk": true
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "yaml.schemas": {
+    "https://json.schemastore.org/github-workflow.json": ".github/workflows/*.{yml,yaml}"
+  },
+  "files.associations": {
+    ".github/workflows/*.yml": "yaml",
+    ".github/workflows/*.yaml": "yaml",
+    "**/.github/workflows/*.yml": "yaml",
+    "**/.github/workflows/*.yaml": "yaml"
+  },
+  "github-actions.use-enterprise": false,
+  "github-actions.remote-name": "origin"
 }

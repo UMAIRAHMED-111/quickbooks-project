@@ -1,4 +1,4 @@
-import { ApiRequestError } from "@/lib/api"
+import { ApiRequestError } from "@/lib/api";
 
 export const HTTP_ERROR_MESSAGES: Record<number, string> = {
   400: "The request was invalid. Please check your input and try again.",
@@ -11,40 +11,37 @@ export const HTTP_ERROR_MESSAGES: Record<number, string> = {
   500: "An unexpected server error occurred. Please try again later.",
   502: "The AI service is temporarily unavailable (e.g. quota). Try again later.",
   503: "The service is unavailable. The database or Q&A may not be configured on the server.",
-}
+};
 
 export const NETWORK_ERROR_MESSAGE =
-  "Network error. Please check your connection and API base URL."
+  "Network error. Please check your connection and API base URL.";
 
 function isRecord(v: unknown): v is Record<string, unknown> {
-  return typeof v === "object" && v !== null
+  return typeof v === "object" && v !== null;
 }
 
 function messageFromBody(body: unknown): string | undefined {
-  if (!isRecord(body)) return undefined
+  if (!isRecord(body)) return undefined;
   if (typeof body.error === "string" && body.error.length > 0) {
-    const detail =
-      typeof body.detail === "string" ? `: ${body.detail}` : ""
-    return `${body.error}${detail}`
+    const detail = typeof body.detail === "string" ? `: ${body.detail}` : "";
+    return `${body.error}${detail}`;
   }
-  if (typeof body.detail === "string") return body.detail
-  if (typeof body.message === "string") return body.message
-  return undefined
+  if (typeof body.detail === "string") return body.detail;
+  if (typeof body.message === "string") return body.message;
+  return undefined;
 }
 
 export function getErrorMessage(err: unknown): string {
   if (err instanceof ApiRequestError) {
-    const fromBody = messageFromBody(err.body)
-    if (fromBody) return fromBody
+    const fromBody = messageFromBody(err.body);
+    if (fromBody) return fromBody;
     return (
-      HTTP_ERROR_MESSAGES[err.status] ??
-      err.message ??
-      "Something went wrong."
-    )
+      HTTP_ERROR_MESSAGES[err.status] ?? err.message ?? "Something went wrong."
+    );
   }
   if (err instanceof TypeError && err.message.includes("fetch")) {
-    return NETWORK_ERROR_MESSAGE
+    return NETWORK_ERROR_MESSAGE;
   }
-  if (err instanceof Error) return err.message
-  return "Something went wrong."
+  if (err instanceof Error) return err.message;
+  return "Something went wrong.";
 }

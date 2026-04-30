@@ -70,7 +70,11 @@ def generate_content_with_retry(
     Total attempts = 1 + max_retries.
     Sleep = max(exponential base * 2**attempt, server hint) capped by GEMINI_RETRY_MAX_SLEEP_SECONDS.
     """
-    limit = _max_retries_from_env() if max_retries is None else max(0, min(int(max_retries), 10))
+    limit = (
+        _max_retries_from_env()
+        if max_retries is None
+        else max(0, min(int(max_retries), 10))
+    )
     base = _base_delay_seconds()
     cap = _max_sleep_seconds()
     attempts = limit + 1

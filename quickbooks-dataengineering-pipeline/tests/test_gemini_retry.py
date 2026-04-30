@@ -42,7 +42,11 @@ def test_generate_content_retries_then_succeeds():
 
     with patch("qbo_pipeline.qa.gemini_retry.time.sleep"):
         out = generate_content_with_retry(
-            client, model="gemini-2.5-flash-lite", contents="hi", config=None, max_retries=3
+            client,
+            model="gemini-2.5-flash-lite",
+            contents="hi",
+            config=None,
+            max_retries=3,
         )
     assert out.text == "done"
     assert client.models.generate_content.call_count == 2

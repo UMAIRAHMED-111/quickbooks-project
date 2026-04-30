@@ -6,11 +6,11 @@ from repo_bootstrap import configure_for_checkout
 
 configure_for_checkout(Path(__file__))
 
-from qbo_pipeline.web.app import create_app
-
 
 @pytest.fixture
 def client(monkeypatch):
+    from qbo_pipeline.web.app import create_app
+
     monkeypatch.delenv("DATABASE_URL", raising=False)
     monkeypatch.delenv("SUPABASE_DB_URL", raising=False)
     app = create_app()

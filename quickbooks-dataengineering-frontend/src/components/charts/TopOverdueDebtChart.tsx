@@ -6,31 +6,35 @@ import {
   Tooltip,
   XAxis,
   YAxis,
-} from "recharts"
-import type { TopOverdueResponse } from "@/types/metrics"
-import {
-  axisTickStyle,
-  chartGridColor,
-  chartMonoScale,
-} from "@/lib/chart-theme"
-import { formatCurrency, truncateLabel } from "@/lib/format"
+} from "recharts";
+import type { TopOverdueResponse } from "@/types/metrics";
+import { useChartTheme } from "@/lib/chart-theme";
+import { formatCurrency, truncateLabel } from "@/lib/format";
 
-type Props = { data: TopOverdueResponse }
+type Props = { data: TopOverdueResponse };
 
 export function TopOverdueDebtChart({ data }: Props) {
-  const rows = [...(data.customers ?? [])]
-    .reverse()
-    .map((c) => ({
-      ...c,
-      shortName: truncateLabel(c.customer_name, 24),
-    }))
+  const { chartGridColor, axisTickStyle, chartMonoScale, tooltipContentStyle } =
+    useChartTheme();
+  const rows = [...(data.customers ?? [])].reverse().map((c) => ({
+    ...c,
+    shortName: truncateLabel(c.customer_name, 24),
+  }));
 
-  if (rows.length === 0) return null
+  if (rows.length === 0) return null;
 
   return (
     <ResponsiveContainer width="100%" height={Math.max(192, rows.length * 26)}>
-      <BarChart layout="vertical" data={rows} margin={{ top: 4, right: 12, left: 2, bottom: 4 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke={chartGridColor} horizontal={false} />
+      <BarChart
+        layout="vertical"
+        data={rows}
+        margin={{ top: 4, right: 12, left: 2, bottom: 4 }}
+      >
+        <CartesianGrid
+          strokeDasharray="3 3"
+          stroke={chartGridColor}
+          horizontal={false}
+        />
         <XAxis
           type="number"
           tick={axisTickStyle}
@@ -47,18 +51,17 @@ export function TopOverdueDebtChart({ data }: Props) {
         <Tooltip
           formatter={(value) => formatCurrency(Number(value ?? 0))}
           labelFormatter={(_, payload) => {
-            const row = payload?.[0]?.payload as { customer_name?: string }
-            return row?.customer_name ?? ""
+            const row = payload?.[0]?.payload as { customer_name?: string };
+            return row?.customer_name ?? "";
           }}
-          contentStyle={{
-            borderRadius: 8,
-            border: `1px solid ${chartGridColor}`,
-            fontSize: 12,
-            maxWidth: 280,
-          }}
+          contentStyle={{ ...tooltipContentStyle, maxWidth: 280 }}
         />
-        <Bar dataKey="overdue_open_balance" fill={chartMonoScale.ink} radius={[0, 6, 6, 0]} />
+        <Bar
+          dataKey="overdue_open_balance"
+          fill={chartMonoScale.ink}
+          radius={[0, 6, 6, 0]}
+        />
       </BarChart>
     </ResponsiveContainer>
-  )
+  );
 }

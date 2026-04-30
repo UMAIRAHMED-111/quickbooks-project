@@ -7,7 +7,12 @@ from uuid import UUID
 
 from qbo_pipeline.config import Settings
 from qbo_pipeline.etl.extract import extract
-from qbo_pipeline.etl.load import create_running_sync_run, load, mark_sync_failed, run_insert_phase
+from qbo_pipeline.etl.load import (
+    create_running_sync_run,
+    load,
+    mark_sync_failed,
+    run_insert_phase,
+)
 from qbo_pipeline.etl.transform import transform
 from qbo_pipeline.observability import get_logger
 
@@ -71,7 +76,9 @@ def continue_sync_run(
         )
     except Exception as exc:
         mark_sync_failed(settings, run_id, str(exc))
-        logger.exception("sync_preload_stage_failed", sync_run_id=run_id, error=str(exc))
+        logger.exception(
+            "sync_preload_stage_failed", sync_run_id=run_id, error=str(exc)
+        )
         raise
     logger.info("sync_insert_started", sync_run_id=run_id)
     return run_insert_phase(settings, run_id, bundle)

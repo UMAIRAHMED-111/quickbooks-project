@@ -44,7 +44,9 @@ def _one(
             cur.execute(sql, params or ())
             row = cur.fetchone()
             if not row:
-                logger.info("analytics_query_completed", query_name=query_name, row_count=0)
+                logger.info(
+                    "analytics_query_completed", query_name=query_name, row_count=0
+                )
                 return None
             out = {k: _serialize(v) for k, v in dict(row).items()}
             logger.info("analytics_query_completed", query_name=query_name, row_count=1)
@@ -59,7 +61,9 @@ def _all(
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute(sql, params or ())
             out = _rows(cur)
-            logger.info("analytics_query_completed", query_name=query_name, row_count=len(out))
+            logger.info(
+                "analytics_query_completed", query_name=query_name, row_count=len(out)
+            )
             return out
 
 
@@ -141,7 +145,9 @@ def customers_top_paying(database_url: str, limit: int = 10) -> dict[str, Any]:
     ORDER BY total_payments DESC NULLS LAST
     LIMIT %s
     """
-    return {"customers": _all(database_url, sql, (lim,), query_name="customers_top_paying")}
+    return {
+        "customers": _all(database_url, sql, (lim,), query_name="customers_top_paying")
+    }
 
 
 def customers_top_outstanding(database_url: str, limit: int = 10) -> dict[str, Any]:

@@ -1,13 +1,18 @@
-import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card"
-import { dashboardCardClass } from "@/lib/dashboard-styles"
-import { cn } from "@/lib/utils"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+} from "@/components/ui/card";
+import { dashboardCardClass } from "@/lib/dashboard-styles";
+import { cn } from "@/lib/utils";
 
 export function KpiCard({ label, value }: { label: string; value: string }) {
   return (
     <Card
       className={cn(
         dashboardCardClass,
-        "group transition-[box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:shadow-lg"
+        "group transition-[box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:shadow-lg",
       )}
     >
       <CardHeader className="pb-1">
@@ -21,5 +26,5 @@ export function KpiCard({ label, value }: { label: string; value: string }) {
         </p>
       </CardContent>
     </Card>
-  )
+  );
 }

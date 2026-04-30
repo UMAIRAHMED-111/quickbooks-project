@@ -12,9 +12,7 @@ def test_parse_pack_list_plain_json():
 
 def test_parse_pack_list_fenced():
     raw = '```json\n["counts_basic", "sample_open_invoices"]\n```'
-    assert _parse_pack_list(raw) == frozenset(
-        {"counts_basic", "sample_open_invoices"}
-    )
+    assert _parse_pack_list(raw) == frozenset({"counts_basic", "sample_open_invoices"})
 
 
 def test_parse_pack_list_invalid_falls_back_to_all():

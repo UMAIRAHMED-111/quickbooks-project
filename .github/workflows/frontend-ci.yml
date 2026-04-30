@@ -2,6 +2,11 @@ name: Frontend CI
 
 on:
   push:
+    branches:
+      - main
+      - 'feat/**'
+      - 'fix/**'
+      - 'chore/**'
     paths:
       - "quickbooks-dataengineering-frontend/**"
       - ".github/workflows/frontend-ci.yml"
@@ -29,6 +34,7 @@ jobs:
 
       - run: npm ci
       - run: npm run lint
+      - run: npx prettier --check "src/**/*.{ts,tsx}"
 
   typecheck-and-build:
     name: Typecheck & Build

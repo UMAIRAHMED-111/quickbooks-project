@@ -1,10 +1,10 @@
-import { BestOnTimePayersChart } from "@/components/charts/BestOnTimePayersChart"
-import { TopOutstandingChart } from "@/components/charts/TopOutstandingChart"
-import { TopOverdueDebtChart } from "@/components/charts/TopOverdueDebtChart"
-import { TopPayingChart } from "@/components/charts/TopPayingChart"
-import { ChartCard } from "@/components/dashboard/ChartCard"
-import { ChartEmpty } from "@/components/dashboard/ChartEmpty"
-import { SectionHeader } from "@/components/dashboard/SectionHeader"
+import { BestOnTimePayersChart } from "@/components/charts/BestOnTimePayersChart";
+import { TopOutstandingChart } from "@/components/charts/TopOutstandingChart";
+import { TopOverdueDebtChart } from "@/components/charts/TopOverdueDebtChart";
+import { TopPayingChart } from "@/components/charts/TopPayingChart";
+import { ChartCard } from "@/components/dashboard/ChartCard";
+import { ChartEmpty } from "@/components/dashboard/ChartEmpty";
+import { SectionHeader } from "@/components/dashboard/SectionHeader";
 import {
   Table,
   TableBody,
@@ -12,20 +12,20 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { formatCurrency, formatInteger } from "@/lib/format"
+} from "@/components/ui/table";
+import { formatCurrency, formatInteger } from "@/lib/format";
 import {
   useBestOnTimePayers,
   useTopOutstanding,
   useTopOverdueDebt,
   useTopPaying,
-} from "@/features/dashboard/hooks/useMetrics"
+} from "@/features/dashboard/hooks/useMetrics";
 
 export function CustomersPage() {
-  const topPaying = useTopPaying(10)
-  const topOutstanding = useTopOutstanding(10)
-  const topOverdue = useTopOverdueDebt(10)
-  const bestOnTime = useBestOnTimePayers(10)
+  const topPaying = useTopPaying(10);
+  const topOutstanding = useTopOutstanding(10);
+  const topOverdue = useTopOverdueDebt(10);
+  const bestOnTime = useBestOnTimePayers(10);
 
   return (
     <div className="space-y-8">
@@ -49,7 +49,9 @@ export function CustomersPage() {
 
         <ChartCard
           title="Top outstanding"
-          description={'Open balance (top 10). Purple bars vs black in "Top paying".'}
+          description={
+            'Open balance (top 10). Purple bars vs black in "Top paying".'
+          }
           loading={topOutstanding.isLoading}
           error={topOutstanding.error}
         >
@@ -117,5 +119,5 @@ export function CustomersPage() {
         </ChartCard>
       </div>
     </div>
-  )
+  );
 }

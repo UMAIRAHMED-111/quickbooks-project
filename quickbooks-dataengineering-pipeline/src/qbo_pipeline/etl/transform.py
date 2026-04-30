@@ -61,9 +61,7 @@ def _allowed_email_sent_statuses() -> frozenset[str]:
 
     Override with env ``QBO_IS_EMAIL_SENT_STATUSES`` (comma-separated, case-insensitive).
     """
-    raw = os.getenv(
-        "QBO_IS_EMAIL_SENT_STATUSES", "Sent,EmailSent,NeedToSend"
-    ).strip()
+    raw = os.getenv("QBO_IS_EMAIL_SENT_STATUSES", "Sent,EmailSent,NeedToSend").strip()
     if not raw:
         return frozenset()
     return frozenset(p.strip().lower() for p in raw.split(",") if p.strip())

@@ -7,27 +7,37 @@ import {
   Tooltip,
   XAxis,
   YAxis,
-} from "recharts"
-import type { PaymentsByMonthResponse } from "@/types/metrics"
-import {
-  axisTickStyle,
-  chartGridColor,
-  chartMonoScale,
-  defaultChartMargin,
-} from "@/lib/chart-theme"
-import { formatCurrency, formatInteger } from "@/lib/format"
+} from "recharts";
+import type { PaymentsByMonthResponse } from "@/types/metrics";
+import { useChartTheme } from "@/lib/chart-theme";
+import { formatCurrency, formatInteger } from "@/lib/format";
 
-type Props = { data: PaymentsByMonthResponse }
+type Props = { data: PaymentsByMonthResponse };
 
 export function PaymentsByMonthChart({ data }: Props) {
-  const series = data.series ?? []
-  if (series.length === 0) return null
+  const {
+    chartGridColor,
+    axisTickStyle,
+    chartMonoScale,
+    defaultChartMargin,
+    tooltipContentStyle,
+  } = useChartTheme();
+  const series = data.series ?? [];
+  if (series.length === 0) return null;
 
   return (
     <ResponsiveContainer width="100%" height={220}>
       <ComposedChart data={series} margin={defaultChartMargin}>
-        <CartesianGrid strokeDasharray="3 3" stroke={chartGridColor} vertical={false} />
-        <XAxis dataKey="month" tick={axisTickStyle} axisLine={{ stroke: chartGridColor }} />
+        <CartesianGrid
+          strokeDasharray="3 3"
+          stroke={chartGridColor}
+          vertical={false}
+        />
+        <XAxis
+          dataKey="month"
+          tick={axisTickStyle}
+          axisLine={{ stroke: chartGridColor }}
+        />
         <YAxis
           yAxisId="left"
           tick={axisTickStyle}
@@ -47,11 +57,7 @@ export function PaymentsByMonthChart({ data }: Props) {
               ? formatCurrency(Number(value ?? 0))
               : formatInteger(Number(value ?? 0))
           }
-          contentStyle={{
-            borderRadius: 8,
-            border: `1px solid ${chartGridColor}`,
-            fontSize: 12,
-          }}
+          contentStyle={tooltipContentStyle}
         />
         <Area
           yAxisId="left"
@@ -74,5 +80,5 @@ export function PaymentsByMonthChart({ data }: Props) {
         />
       </ComposedChart>
     </ResponsiveContainer>
-  )
+  );
 }

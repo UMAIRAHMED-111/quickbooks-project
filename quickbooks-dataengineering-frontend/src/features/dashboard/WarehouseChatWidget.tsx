@@ -1,92 +1,95 @@
-import { Bot, Loader2, SendHorizontal, Sparkles, X } from "lucide-react"
-import { useCallback, useEffect, useId, useRef, useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
-import { getErrorMessage } from "@/lib/errorCodes"
-import { StructuredAnswer } from "@/features/dashboard/components/StructuredAnswer"
-import { useWarehouseQaMutation } from "@/features/dashboard/hooks/useMetrics"
-import { cn } from "@/lib/utils"
-import type { QaContextMessage } from "@/types/metrics"
+import { Bot, Loader2, SendHorizontal, Sparkles, X } from "lucide-react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { getErrorMessage } from "@/lib/errorCodes";
+import { StructuredAnswer } from "@/features/dashboard/components/StructuredAnswer";
+import { useWarehouseQaMutation } from "@/features/dashboard/hooks/useMetrics";
+import { cn } from "@/lib/utils";
+import type { QaContextMessage } from "@/types/metrics";
 
-type ChatRole = "user" | "assistant"
+type ChatRole = "user" | "assistant";
 
 type ChatMessage = {
-  id: string
-  role: ChatRole
-  content: string
-  isError?: boolean
-}
+  id: string;
+  role: ChatRole;
+  content: string;
+  isError?: boolean;
+};
 
 function newId() {
-  return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 }
 
 type WarehouseChatWidgetProps = {
   /** Bumps when warehouse sync succeeds — remounts the thread so answers match fresh data. */
-  dataEpoch: number
-}
+  dataEpoch: number;
+};
 
 /**
  * One conversation instance; parent sets key={dataEpoch} to reset after sync.
  */
 function WarehouseChatConversation() {
-  const [draft, setDraft] = useState("")
-  const [messages, setMessages] = useState<ChatMessage[]>([])
-  const qa = useWarehouseQaMutation()
-  const listRef = useRef<HTMLDivElement>(null)
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const [draft, setDraft] = useState("");
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const qa = useWarehouseQaMutation();
+  const listRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
-    queueMicrotask(() => textareaRef.current?.focus())
-  }, [])
+    queueMicrotask(() => textareaRef.current?.focus());
+  }, []);
 
   useEffect(() => {
-    listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" })
-  }, [messages, qa.isPending])
+    listRef.current?.scrollTo({
+      top: listRef.current.scrollHeight,
+      behavior: "smooth",
+    });
+  }, [messages, qa.isPending]);
 
   const appendMessage = useCallback((msg: Omit<ChatMessage, "id">) => {
-    setMessages((m) => [...m, { ...msg, id: newId() }])
-  }, [])
+    setMessages((m) => [...m, { ...msg, id: newId() }]);
+  }, []);
 
   const send = useCallback(() => {
-    const q = draft.trim()
-    if (!q || qa.isPending) return
+    const q = draft.trim();
+    if (!q || qa.isPending) return;
 
     const context: QaContextMessage[] = messages
       .filter((m) => !m.isError && m.content.trim())
-      .map((m) => ({ role: m.role, content: m.content }))
+      .map((m) => ({ role: m.role, content: m.content }));
 
-    appendMessage({ role: "user", content: q })
-    setDraft("")
+    appendMessage({ role: "user", content: q });
+    setDraft("");
 
     qa.mutate(
       { question: q, context: context.length ? context : undefined },
       {
         onSuccess: (res) => {
-          appendMessage({ role: "assistant", content: res.answer })
+          appendMessage({ role: "assistant", content: res.answer });
         },
         onError: (err) => {
           appendMessage({
             role: "assistant",
             content: getErrorMessage(err),
             isError: true,
-          })
+          });
         },
-      }
-    )
-  }, [appendMessage, draft, messages, qa])
+      },
+    );
+  }, [appendMessage, draft, messages, qa]);
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    send()
-  }
+    e.preventDefault();
+    send();
+  };
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault()
-      send()
+      e.preventDefault();
+      send();
     }
-  }
+  };
 
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-col">
@@ -102,7 +105,10 @@ function WarehouseChatConversation() {
           messages.map((m) => (
             <div
               key={m.id}
-              className={cn("flex w-full", m.role === "user" ? "justify-end" : "justify-start")}
+              className={cn(
+                "flex w-full",
+                m.role === "user" ? "justify-end" : "justify-start",
+              )}
             >
               <div
                 className={cn(
@@ -111,7 +117,7 @@ function WarehouseChatConversation() {
                     ? "bg-primary text-primary-foreground rounded-br-md"
                     : m.isError
                       ? "bg-destructive/10 text-destructive border-destructive/20 rounded-bl-md border"
-                      : "bg-muted text-foreground rounded-bl-md border border-transparent"
+                      : "bg-muted text-foreground rounded-bl-md border border-transparent",
                 )}
               >
                 {m.role === "assistant" && !m.isError ? (
@@ -165,21 +171,21 @@ function WarehouseChatConversation() {
         </div>
       </form>
     </div>
-  )
+  );
 }
 
 export function WarehouseChatWidget({ dataEpoch }: WarehouseChatWidgetProps) {
-  const [open, setOpen] = useState(false)
-  const titleId = useId()
+  const [open, setOpen] = useState(false);
+  const titleId = useId();
 
   useEffect(() => {
-    if (!open) return
+    if (!open) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false)
-    }
-    window.addEventListener("keydown", onKey)
-    return () => window.removeEventListener("keydown", onKey)
-  }, [open])
+      if (e.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
 
   return (
     <>
@@ -192,7 +198,7 @@ export function WarehouseChatWidget({ dataEpoch }: WarehouseChatWidgetProps) {
           "shadow-[0_10px_36px_-8px_rgba(92,31,163,0.55),0_4px_16px_rgba(0,0,0,0.28)]",
           "hover:scale-105 hover:shadow-[0_14px_44px_-8px_rgba(92,31,163,0.6),0_6px_20px_rgba(0,0,0,0.3)]",
           "active:scale-95",
-          "focus-visible:ring-ring focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+          "focus-visible:ring-ring focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none",
         )}
         aria-label="Open warehouse assistant"
         aria-haspopup="dialog"
@@ -218,7 +224,7 @@ export function WarehouseChatWidget({ dataEpoch }: WarehouseChatWidgetProps) {
             className={cn(
               "border-border bg-background relative z-[101] flex max-h-[min(92vh,720px)] w-full max-w-[440px] flex-col overflow-hidden shadow-2xl",
               "max-sm:max-h-[85vh] max-sm:rounded-t-3xl max-sm:border-t max-sm:border-x",
-              "sm:max-h-[min(calc(100vh-2rem),720px)] sm:rounded-2xl sm:border"
+              "sm:max-h-[min(calc(100vh-2rem),720px)] sm:rounded-2xl sm:border",
             )}
           >
             <header className="border-border flex shrink-0 items-start justify-between gap-3 border-b px-4 py-3">
@@ -228,11 +234,15 @@ export function WarehouseChatWidget({ dataEpoch }: WarehouseChatWidgetProps) {
                     <Sparkles className="text-primary size-4" aria-hidden />
                   </div>
                   <div>
-                    <h2 id={titleId} className="text-foreground text-base font-semibold tracking-tight">
+                    <h2
+                      id={titleId}
+                      className="text-foreground text-base font-semibold tracking-tight"
+                    >
                       Warehouse assistant
                     </h2>
                     <p className="text-muted-foreground text-xs leading-snug">
-                      Ask in plain English — answers use your latest sync (server-side).
+                      Ask in plain English — answers use your latest sync
+                      (server-side).
                     </p>
                   </div>
                 </div>
@@ -254,5 +264,5 @@ export function WarehouseChatWidget({ dataEpoch }: WarehouseChatWidgetProps) {
         </div>
       ) : null}
     </>
-  )
+  );
 }
