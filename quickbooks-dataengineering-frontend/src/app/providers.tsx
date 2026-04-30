@@ -1,11 +1,11 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { useState } from "react"
-import { Toaster } from "@/components/ui/sonner"
-import { ApiRequestError } from "@/lib/api"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useState } from "react";
+import { Toaster } from "@/components/ui/sonner";
+import { ApiRequestError } from "@/lib/api";
 
 type ProvidersProps = {
-  children: React.ReactNode
-}
+  children: React.ReactNode;
+};
 
 export function Providers({ children }: ProvidersProps) {
   const [queryClient] = useState(
@@ -18,19 +18,19 @@ export function Providers({ children }: ProvidersProps) {
                 error instanceof ApiRequestError &&
                 (error.status === 401 || error.status === 400)
               ) {
-                return false
+                return false;
               }
-              return count < 2
+              return count < 2;
             },
           },
         },
-      })
-  )
+      }),
+  );
 
   return (
     <QueryClientProvider client={queryClient}>
       {children}
       <Toaster position="top-right" richColors closeButton />
     </QueryClientProvider>
-  )
+  );
 }

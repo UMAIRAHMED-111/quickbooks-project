@@ -1,34 +1,38 @@
-import { OverdueVsCurrentChart } from "@/components/charts/OverdueVsCurrentChart"
-import { PaidOnTimeVsLateChart } from "@/components/charts/PaidOnTimeVsLateChart"
+import { OverdueVsCurrentChart } from "@/components/charts/OverdueVsCurrentChart";
+import { PaidOnTimeVsLateChart } from "@/components/charts/PaidOnTimeVsLateChart";
 import {
   PaidVsUnpaidAmountsNote,
   PaidVsUnpaidChart,
-} from "@/components/charts/PaidVsUnpaidChart"
-import { SentVsUnsentChart } from "@/components/charts/SentVsUnsentChart"
-import { ChartCard } from "@/components/dashboard/ChartCard"
-import { ChartEmpty } from "@/components/dashboard/ChartEmpty"
-import { SectionHeader } from "@/components/dashboard/SectionHeader"
-import type { OverdueVsCurrentResponse } from "@/types/metrics"
+} from "@/components/charts/PaidVsUnpaidChart";
+import { SentVsUnsentChart } from "@/components/charts/SentVsUnsentChart";
+import { ChartCard } from "@/components/dashboard/ChartCard";
+import { ChartEmpty } from "@/components/dashboard/ChartEmpty";
+import { SectionHeader } from "@/components/dashboard/SectionHeader";
+import type { OverdueVsCurrentResponse } from "@/types/metrics";
 import {
   useOverdueVsCurrent,
   usePaidOnTimeVsLate,
   usePaidVsUnpaid,
   useSentVsUnsent,
-} from "@/features/dashboard/hooks/useMetrics"
+} from "@/features/dashboard/hooks/useMetrics";
 
 function overdueUnpaidTotals(d: OverdueVsCurrentResponse) {
   const overdue =
-    d.overdue_unpaid_count ?? (d as { overdue_count?: number }).overdue_count ?? 0
+    d.overdue_unpaid_count ??
+    (d as { overdue_count?: number }).overdue_count ??
+    0;
   const current =
-    d.current_unpaid_count ?? (d as { current_count?: number }).current_count ?? 0
-  return { overdue, current, total: overdue + current }
+    d.current_unpaid_count ??
+    (d as { current_count?: number }).current_count ??
+    0;
+  return { overdue, current, total: overdue + current };
 }
 
 export function InvoicesPage() {
-  const paidVsUnpaid = usePaidVsUnpaid()
-  const sentVsUnsent = useSentVsUnsent()
-  const overdueVsCurrent = useOverdueVsCurrent()
-  const paidOnTime = usePaidOnTimeVsLate()
+  const paidVsUnpaid = usePaidVsUnpaid();
+  const sentVsUnsent = useSentVsUnsent();
+  const overdueVsCurrent = useOverdueVsCurrent();
+  const paidOnTime = usePaidOnTimeVsLate();
 
   return (
     <div className="space-y-8">
@@ -48,7 +52,8 @@ export function InvoicesPage() {
         >
           {paidVsUnpaid.data ? (
             <>
-              {paidVsUnpaid.data.paid_count + paidVsUnpaid.data.unpaid_count > 0 ? (
+              {paidVsUnpaid.data.paid_count + paidVsUnpaid.data.unpaid_count >
+              0 ? (
                 <PaidVsUnpaidChart data={paidVsUnpaid.data} />
               ) : (
                 <ChartEmpty square label="No invoice split data." />
@@ -87,7 +92,10 @@ export function InvoicesPage() {
             overdueUnpaidTotals(overdueVsCurrent.data).total > 0 ? (
               <OverdueVsCurrentChart data={overdueVsCurrent.data} />
             ) : (
-              <ChartEmpty square label="No overdue / current unpaid invoices." />
+              <ChartEmpty
+                square
+                label="No overdue / current unpaid invoices."
+              />
             )
           ) : null}
         </ChartCard>
@@ -113,5 +121,5 @@ export function InvoicesPage() {
         </ChartCard>
       </div>
     </div>
-  )
+  );
 }

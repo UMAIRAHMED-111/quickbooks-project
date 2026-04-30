@@ -1,5 +1,5 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import type { QaRequestBody } from "@/types/metrics"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { QaRequestBody } from "@/types/metrics";
 import {
   askWarehouse,
   getAllocationsSummary,
@@ -14,13 +14,15 @@ import {
   getTopOverdueDebt,
   getTopPaying,
   postSync,
-} from "@/lib/api"
+} from "@/lib/api";
 
 export const metricsKeys = {
   all: ["metrics"] as const,
   overview: () => [...metricsKeys.all, "overview"] as const,
-  paidVsUnpaid: () => [...metricsKeys.all, "invoices", "paid-vs-unpaid"] as const,
-  sentVsUnsent: () => [...metricsKeys.all, "invoices", "sent-vs-unsent"] as const,
+  paidVsUnpaid: () =>
+    [...metricsKeys.all, "invoices", "paid-vs-unpaid"] as const,
+  sentVsUnsent: () =>
+    [...metricsKeys.all, "invoices", "sent-vs-unsent"] as const,
   overdueVsCurrent: () =>
     [...metricsKeys.all, "invoices", "overdue-vs-current"] as const,
   paidOnTimeVsLate: () =>
@@ -35,16 +37,16 @@ export const metricsKeys = {
     [...metricsKeys.all, "customers", "best-on-time", limit] as const,
   paymentsByMonth: () => [...metricsKeys.all, "payments", "by-month"] as const,
   allocations: () => [...metricsKeys.all, "allocations", "summary"] as const,
-}
+};
 
-const stale = 60_000
+const stale = 60_000;
 
 export function useOverview() {
   return useQuery({
     queryKey: metricsKeys.overview(),
     queryFn: getOverview,
     staleTime: stale,
-  })
+  });
 }
 
 export function usePaidVsUnpaid() {
@@ -52,7 +54,7 @@ export function usePaidVsUnpaid() {
     queryKey: metricsKeys.paidVsUnpaid(),
     queryFn: getPaidVsUnpaid,
     staleTime: stale,
-  })
+  });
 }
 
 export function useSentVsUnsent() {
@@ -60,7 +62,7 @@ export function useSentVsUnsent() {
     queryKey: metricsKeys.sentVsUnsent(),
     queryFn: getSentVsUnsent,
     staleTime: stale,
-  })
+  });
 }
 
 export function useOverdueVsCurrent() {
@@ -68,7 +70,7 @@ export function useOverdueVsCurrent() {
     queryKey: metricsKeys.overdueVsCurrent(),
     queryFn: getOverdueVsCurrent,
     staleTime: stale,
-  })
+  });
 }
 
 export function usePaidOnTimeVsLate() {
@@ -76,7 +78,7 @@ export function usePaidOnTimeVsLate() {
     queryKey: metricsKeys.paidOnTimeVsLate(),
     queryFn: getPaidOnTimeVsLate,
     staleTime: stale,
-  })
+  });
 }
 
 export function useTopPaying(limit = 10) {
@@ -84,7 +86,7 @@ export function useTopPaying(limit = 10) {
     queryKey: metricsKeys.topPaying(limit),
     queryFn: () => getTopPaying(limit),
     staleTime: stale,
-  })
+  });
 }
 
 export function useTopOutstanding(limit = 10) {
@@ -92,7 +94,7 @@ export function useTopOutstanding(limit = 10) {
     queryKey: metricsKeys.topOutstanding(limit),
     queryFn: () => getTopOutstanding(limit),
     staleTime: stale,
-  })
+  });
 }
 
 export function useTopOverdueDebt(limit = 10) {
@@ -100,7 +102,7 @@ export function useTopOverdueDebt(limit = 10) {
     queryKey: metricsKeys.topOverdue(limit),
     queryFn: () => getTopOverdueDebt(limit),
     staleTime: stale,
-  })
+  });
 }
 
 export function useBestOnTimePayers(limit = 10) {
@@ -108,7 +110,7 @@ export function useBestOnTimePayers(limit = 10) {
     queryKey: metricsKeys.bestOnTime(limit),
     queryFn: () => getBestOnTimePayers(limit),
     staleTime: stale,
-  })
+  });
 }
 
 export function usePaymentsByMonth() {
@@ -116,7 +118,7 @@ export function usePaymentsByMonth() {
     queryKey: metricsKeys.paymentsByMonth(),
     queryFn: getPaymentsByMonth,
     staleTime: stale,
-  })
+  });
 }
 
 export function useAllocationsSummary() {
@@ -124,21 +126,21 @@ export function useAllocationsSummary() {
     queryKey: metricsKeys.allocations(),
     queryFn: getAllocationsSummary,
     staleTime: stale,
-  })
+  });
 }
 
 export function useSyncMutation() {
-  const qc = useQueryClient()
+  const qc = useQueryClient();
   return useMutation({
     mutationFn: postSync,
     onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: metricsKeys.all })
+      void qc.invalidateQueries({ queryKey: metricsKeys.all });
     },
-  })
+  });
 }
 
 export function useWarehouseQaMutation() {
   return useMutation({
     mutationFn: (body: QaRequestBody) => askWarehouse(body),
-  })
+  });
 }

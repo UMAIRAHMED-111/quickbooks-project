@@ -9,6 +9,8 @@ Report: total files changed, insertions, deletions.
 ### Step 2 — Frontend validation (skip if no frontend files changed)
 Detect: `git diff main...HEAD --name-only | grep "^quickbooks-dataengineering-frontend/"`
 If frontend files changed:
+- Run: `cd quickbooks-dataengineering-frontend && npx prettier --write "src/**/*.{ts,tsx}"`
+- Run: `cd quickbooks-dataengineering-frontend && npx prettier --check "src/**/*.{ts,tsx}"`
 - Run: `cd quickbooks-dataengineering-frontend && npm run build`
 - Run: `cd quickbooks-dataengineering-frontend && npm run lint`
 - Record: PASS or FAIL with any error summary (max 5 lines of output)
@@ -45,6 +47,7 @@ Output the full stacked PR plan.
 
 Changes: <N files, +X -Y lines>
 
+[ PASS / FAIL ] Frontend prettier
 [ PASS / FAIL ] Frontend build
 [ PASS / FAIL ] Frontend lint
 [ PASS / FAIL ] Backend tests  (<N passed, M failed>)

@@ -1,9 +1,9 @@
-import type { ReactNode } from "react"
-import { ResponsiveContainer } from "recharts"
+import type { ReactNode } from "react";
+import { ResponsiveContainer } from "recharts";
 
 type SquarePlotFrameProps = {
-  children: ReactNode
-}
+  children: ReactNode;
+};
 
 /**
  * Square plot area so four invoice charts align cleanly in one row (xl+).
@@ -15,5 +15,5 @@ export function SquarePlotFrame({ children }: SquarePlotFrameProps) {
         {children}
       </ResponsiveContainer>
     </div>
-  )
+  );
 }

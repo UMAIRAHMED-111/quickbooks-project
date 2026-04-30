@@ -1,21 +1,21 @@
-import { Cell, Legend, Pie, PieChart, Tooltip } from "recharts"
-import type { PaidVsUnpaidResponse } from "@/types/metrics"
-import { SquarePlotFrame } from "@/components/charts/SquarePlotFrame"
-import { chartDualMonochrome } from "@/lib/chart-theme"
-import { formatCurrency, formatInteger } from "@/lib/format"
-import { cn } from "@/lib/utils"
+import { Cell, Legend, Pie, PieChart, Tooltip } from "recharts";
+import type { PaidVsUnpaidResponse } from "@/types/metrics";
+import { SquarePlotFrame } from "@/components/charts/SquarePlotFrame";
+import { chartDualMonochrome } from "@/lib/chart-theme";
+import { formatCurrency, formatInteger } from "@/lib/format";
+import { cn } from "@/lib/utils";
 
-const COLORS = [chartDualMonochrome.ink, chartDualMonochrome.inkMuted]
+const COLORS = [chartDualMonochrome.ink, chartDualMonochrome.inkMuted];
 
-type Props = { data: PaidVsUnpaidResponse }
+type Props = { data: PaidVsUnpaidResponse };
 
 export function PaidVsUnpaidChart({ data }: Props) {
   const pieData = [
     { name: "Paid", value: data.paid_count },
     { name: "Unpaid", value: data.unpaid_count },
-  ]
-  const total = pieData.reduce((s, d) => s + d.value, 0)
-  if (total === 0) return null
+  ];
+  const total = pieData.reduce((s, d) => s + d.value, 0);
+  if (total === 0) return null;
 
   return (
     <SquarePlotFrame>
@@ -47,10 +47,14 @@ export function PaidVsUnpaidChart({ data }: Props) {
             fontSize: 11,
           }}
         />
-        <Legend verticalAlign="bottom" height={22} wrapperStyle={{ fontSize: 11 }} />
+        <Legend
+          verticalAlign="bottom"
+          height={22}
+          wrapperStyle={{ fontSize: 11 }}
+        />
       </PieChart>
     </SquarePlotFrame>
-  )
+  );
 }
 
 export function PaidVsUnpaidAmountsNote({
@@ -61,12 +65,12 @@ export function PaidVsUnpaidAmountsNote({
     <p
       className={cn(
         "text-muted-foreground mt-2 leading-relaxed",
-        compact ? "text-[0.65rem] leading-snug" : "text-xs"
+        compact ? "text-[0.65rem] leading-snug" : "text-xs",
       )}
     >
       Paid billed {formatCurrency(data.paid_total_billed)} · Unpaid open{" "}
       {formatCurrency(data.unpaid_open_balance)} · Unpaid billed{" "}
       {formatCurrency(data.unpaid_total_billed)}
     </p>
-  )
+  );
 }

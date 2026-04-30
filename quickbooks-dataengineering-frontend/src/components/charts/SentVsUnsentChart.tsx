@@ -7,47 +7,50 @@ import {
   Tooltip,
   XAxis,
   YAxis,
-} from "recharts"
-import { SquarePlotFrame } from "@/components/charts/SquarePlotFrame"
-import type { SentVsUnsentResponse } from "@/types/metrics"
+} from "recharts";
+import { SquarePlotFrame } from "@/components/charts/SquarePlotFrame";
+import type { SentVsUnsentResponse } from "@/types/metrics";
 import {
   axisTickStyle,
   chartDualMonochrome,
   chartGridColor,
   defaultChartMargin,
-} from "@/lib/chart-theme"
-import { formatCurrency, formatInteger } from "@/lib/format"
+} from "@/lib/chart-theme";
+import { formatCurrency, formatInteger } from "@/lib/format";
 
-type Props = { data: SentVsUnsentResponse; variant?: "default" | "grid" }
+type Props = { data: SentVsUnsentResponse; variant?: "default" | "grid" };
 
 type BucketRow = {
-  label: string
-  email_sent: boolean
-  invoice_count: number
-  sum_total_amount: number
-  sum_open_balance: number
-}
+  label: string;
+  email_sent: boolean;
+  invoice_count: number;
+  sum_total_amount: number;
+  sum_open_balance: number;
+};
 
 /** Email sent = black, not sent = dark purple (favicon-aligned). */
 function barFillForBucket(email_sent: boolean) {
-  return email_sent ? chartDualMonochrome.ink : chartDualMonochrome.inkMuted
+  return email_sent ? chartDualMonochrome.ink : chartDualMonochrome.inkMuted;
 }
 
 function SentVsUnsentTooltip({
   active,
   payload,
 }: {
-  active?: boolean
-  payload?: ReadonlyArray<{ payload: BucketRow }>
+  active?: boolean;
+  payload?: ReadonlyArray<{ payload: BucketRow }>;
 }) {
-  if (!active || !payload?.[0]) return null
-  const row = payload[0].payload
+  if (!active || !payload?.[0]) return null;
+  const row = payload[0].payload;
   return (
     <div className="border-border bg-popover text-popover-foreground rounded-lg border px-3 py-2 text-xs shadow-md">
       <p className="mb-1.5 font-semibold">{row.label}</p>
       <p className="tabular-nums">
         <span className="text-foreground font-medium">Invoices</span>
-        <span className="text-muted-foreground"> · {formatInteger(row.invoice_count)}</span>
+        <span className="text-muted-foreground">
+          {" "}
+          · {formatInteger(row.invoice_count)}
+        </span>
       </p>
       <p className="text-muted-foreground mt-1 tabular-nums">
         Total billed · {formatCurrency(row.sum_total_amount)}
@@ -56,7 +59,7 @@ function SentVsUnsentTooltip({
         Open balance · {formatCurrency(row.sum_open_balance)}
       </p>
     </div>
-  )
+  );
 }
 
 export function SentVsUnsentChart({ data, variant = "default" }: Props) {
@@ -66,14 +69,22 @@ export function SentVsUnsentChart({ data, variant = "default" }: Props) {
     invoice_count: b.invoice_count,
     sum_total_amount: b.sum_total_amount ?? 0,
     sum_open_balance: b.sum_open_balance ?? 0,
-  }))
+  }));
 
-  if (chartData.length === 0) return null
+  if (chartData.length === 0) return null;
 
   const chart = (
     <BarChart data={chartData} margin={defaultChartMargin}>
-      <CartesianGrid strokeDasharray="3 3" stroke={chartGridColor} vertical={false} />
-      <XAxis dataKey="label" tick={axisTickStyle} axisLine={{ stroke: chartGridColor }} />
+      <CartesianGrid
+        strokeDasharray="3 3"
+        stroke={chartGridColor}
+        vertical={false}
+      />
+      <XAxis
+        dataKey="label"
+        tick={axisTickStyle}
+        axisLine={{ stroke: chartGridColor }}
+      />
       <YAxis
         tick={axisTickStyle}
         axisLine={{ stroke: chartGridColor }}
@@ -85,19 +96,22 @@ export function SentVsUnsentChart({ data, variant = "default" }: Props) {
       />
       <Bar dataKey="invoice_count" name="Invoices" radius={[6, 6, 0, 0]}>
         {chartData.map((row, i) => (
-          <Cell key={`${row.email_sent}-${i}`} fill={barFillForBucket(row.email_sent)} />
+          <Cell
+            key={`${row.email_sent}-${i}`}
+            fill={barFillForBucket(row.email_sent)}
+          />
         ))}
       </Bar>
     </BarChart>
-  )
+  );
 
   if (variant === "grid") {
-    return <SquarePlotFrame>{chart}</SquarePlotFrame>
+    return <SquarePlotFrame>{chart}</SquarePlotFrame>;
   }
 
   return (
     <ResponsiveContainer width="100%" height={200}>
       {chart}
     </ResponsiveContainer>
-  )
+  );
 }

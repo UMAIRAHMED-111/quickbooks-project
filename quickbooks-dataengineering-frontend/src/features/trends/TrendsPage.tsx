@@ -1,22 +1,28 @@
-import { PaymentsByMonthChart } from "@/components/charts/PaymentsByMonthChart"
-import { ChartCard } from "@/components/dashboard/ChartCard"
-import { ChartEmpty } from "@/components/dashboard/ChartEmpty"
-import { SectionHeader } from "@/components/dashboard/SectionHeader"
-import { Stat } from "@/components/dashboard/Stat"
-import { BlockError } from "@/components/dashboard/BlockError"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Skeleton } from "@/components/ui/skeleton"
-import { dashboardCardClass } from "@/lib/dashboard-styles"
-import { formatCurrency, formatInteger } from "@/lib/format"
-import { cn } from "@/lib/utils"
+import { PaymentsByMonthChart } from "@/components/charts/PaymentsByMonthChart";
+import { ChartCard } from "@/components/dashboard/ChartCard";
+import { ChartEmpty } from "@/components/dashboard/ChartEmpty";
+import { SectionHeader } from "@/components/dashboard/SectionHeader";
+import { Stat } from "@/components/dashboard/Stat";
+import { BlockError } from "@/components/dashboard/BlockError";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { dashboardCardClass } from "@/lib/dashboard-styles";
+import { formatCurrency, formatInteger } from "@/lib/format";
+import { cn } from "@/lib/utils";
 import {
   useAllocationsSummary,
   usePaymentsByMonth,
-} from "@/features/dashboard/hooks/useMetrics"
+} from "@/features/dashboard/hooks/useMetrics";
 
 export function TrendsPage() {
-  const byMonth = usePaymentsByMonth()
-  const allocations = useAllocationsSummary()
+  const byMonth = usePaymentsByMonth();
+  const allocations = useAllocationsSummary();
 
   return (
     <div className="space-y-8">
@@ -55,18 +61,25 @@ export function TrendsPage() {
               <BlockError error={allocations.error} />
             ) : allocations.data ? (
               <dl className="grid grid-cols-2 gap-3 text-sm">
-                <Stat label="Allocations" value={formatInteger(allocations.data.allocation_count)} />
+                <Stat
+                  label="Allocations"
+                  value={formatInteger(allocations.data.allocation_count)}
+                />
                 <Stat
                   label="Total allocated"
                   value={formatCurrency(allocations.data.total_allocated)}
                 />
                 <Stat
                   label="Payments w/ allocations"
-                  value={formatInteger(allocations.data.payments_with_allocations)}
+                  value={formatInteger(
+                    allocations.data.payments_with_allocations,
+                  )}
                 />
                 <Stat
                   label="Invoices w/ allocations"
-                  value={formatInteger(allocations.data.invoices_with_allocations)}
+                  value={formatInteger(
+                    allocations.data.invoices_with_allocations,
+                  )}
                 />
               </dl>
             ) : null}
@@ -74,5 +87,5 @@ export function TrendsPage() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

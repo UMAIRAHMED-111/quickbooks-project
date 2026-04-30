@@ -1,17 +1,17 @@
-import { useMemo, type ReactNode } from "react"
-import { parseAnswerBlocks } from "@/lib/parseAnswerBlocks"
-import { cn } from "@/lib/utils"
+import { useMemo, type ReactNode } from "react";
+import { parseAnswerBlocks } from "@/lib/parseAnswerBlocks";
+import { cn } from "@/lib/utils";
 
 type StructuredAnswerProps = {
-  text: string
-  className?: string
-}
+  text: string;
+  className?: string;
+};
 
-const CURRENCY = /(\$[\d,]+(?:\.\d{1,2})?)/g
+const CURRENCY = /(\$[\d,]+(?:\.\d{1,2})?)/g;
 
 /** Currency + markdown-style **bold** (common in LLM answers). */
 function formatCurrencyParts(text: string, keyPrefix: string): ReactNode[] {
-  const parts = text.split(CURRENCY)
+  const parts = text.split(CURRENCY);
   return parts.map((part, i) => {
     if (/^\$[\d,]+(?:\.\d{1,2})?$/.test(part)) {
       return (
@@ -21,37 +21,37 @@ function formatCurrencyParts(text: string, keyPrefix: string): ReactNode[] {
         >
           {part}
         </span>
-      )
+      );
     }
-    return part
-  })
+    return part;
+  });
 }
 
 function formatInline(text: string): ReactNode {
-  const segments = text.split(/(\*\*[\s\S]+?\*\*)/g)
-  const out: ReactNode[] = []
+  const segments = text.split(/(\*\*[\s\S]+?\*\*)/g);
+  const out: ReactNode[] = [];
   segments.forEach((seg, segIdx) => {
     const isBold =
-      seg.startsWith("**") && seg.endsWith("**") && seg.length >= 4
+      seg.startsWith("**") && seg.endsWith("**") && seg.length >= 4;
     if (isBold) {
-      const inner = seg.slice(2, -2)
+      const inner = seg.slice(2, -2);
       out.push(
         <strong
           key={`b-${segIdx}`}
           className="text-foreground font-semibold tracking-tight"
         >
           {formatCurrencyParts(inner, `b-${segIdx}`)}
-        </strong>
-      )
+        </strong>,
+      );
     } else {
-      out.push(...formatCurrencyParts(seg, `t-${segIdx}`))
+      out.push(...formatCurrencyParts(seg, `t-${segIdx}`));
     }
-  })
-  return out
+  });
+  return out;
 }
 
 function ListBlock({ ordered, items }: { ordered: boolean; items: string[] }) {
-  const ListTag = ordered ? "ol" : "ul"
+  const ListTag = ordered ? "ol" : "ul";
   return (
     <ListTag className="m-0 list-none space-y-2.5 p-0">
       {items.map((item, idx) => (
@@ -80,16 +80,18 @@ function ListBlock({ ordered, items }: { ordered: boolean; items: string[] }) {
         </li>
       ))}
     </ListTag>
-  )
+  );
 }
 
 export function StructuredAnswer({ text, className }: StructuredAnswerProps) {
-  const blocks = useMemo(() => parseAnswerBlocks(text), [text])
+  const blocks = useMemo(() => parseAnswerBlocks(text), [text]);
 
   if (blocks.length === 0) {
     return (
-      <p className="text-muted-foreground text-sm italic">No answer text returned.</p>
-    )
+      <p className="text-muted-foreground text-sm italic">
+        No answer text returned.
+      </p>
+    );
   }
 
   return (
@@ -103,13 +105,13 @@ export function StructuredAnswer({ text, className }: StructuredAnswerProps) {
             >
               {formatInline(block.text)}
             </p>
-          )
+          );
         }
         if (block.type === "bullet") {
-          return <ListBlock key={i} ordered={false} items={block.items} />
+          return <ListBlock key={i} ordered={false} items={block.items} />;
         }
-        return <ListBlock key={i} ordered items={block.items} />
+        return <ListBlock key={i} ordered items={block.items} />;
       })}
     </div>
-  )
+  );
 }

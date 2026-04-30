@@ -4,7 +4,9 @@ export function Stat({ label, value }: { label: string; value: string }) {
       <dt className="text-muted-foreground text-[0.7rem] font-semibold tracking-wide uppercase">
         {label}
       </dt>
-      <dd className="text-foreground mt-1 text-base font-semibold tabular-nums">{value}</dd>
+      <dd className="text-foreground mt-1 text-base font-semibold tabular-nums">
+        {value}
+      </dd>
     </div>
-  )
+  );
 }

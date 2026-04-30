@@ -47,6 +47,7 @@ They are independent — no shared build, no shared dependencies. The frontend c
 **After every code change, verify:**
 ```bash
 # Frontend
+npx prettier --write "src/**/*.{ts,tsx}" && npx prettier --check "src/**/*.{ts,tsx}"
 npm run build && npm run lint   # must pass clean — zero type errors, zero lint warnings
 
 # Backend

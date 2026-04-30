@@ -9,18 +9,18 @@ export const chartPalette = {
   muted: "#64748b",
   success: "#16a34a",
   danger: "#dc2626",
-} as const
+} as const;
 
 /** Primary data ink (near black). */
-const ink = "#0a0a0a"
+const ink = "#0a0a0a";
 /**
  * Dark purple — second tone, aligned with favicon (`#7e14ff` / `#863bff`).
  */
-const inkMuted = "#5c1fa3"
+const inkMuted = "#5c1fa3";
 /**
  * Lighter violet for tertiary series / secondary lines (still on-brand).
  */
-const inkLight = "#8f6bdc"
+const inkLight = "#8f6bdc";
 
 /**
  * Black + favicon-adjacent purples for multi-series charts.
@@ -29,25 +29,25 @@ export const chartMonoScale = {
   ink,
   inkMuted,
   inkLight,
-} as const
+} as const;
 
 /** Binary splits (2 bars / 2 slices). */
 export const chartDualMonochrome = {
   ink,
   inkMuted,
-} as const
+} as const;
 
-export const chartGridColor = "#e5e7eb"
+export const chartGridColor = "#e5e7eb";
 
-export const defaultChartMargin = { top: 4, right: 8, left: 2, bottom: 4 }
+export const defaultChartMargin = { top: 4, right: 8, left: 2, bottom: 4 };
 
 export const axisTickStyle = {
   fill: "#404040",
   fontSize: 10,
-} as const
+} as const;
 
 export const axisLabelStyle = {
   fill: "#525252",
   fontSize: 12,
   fontWeight: 500,
-} as const
+} as const;
