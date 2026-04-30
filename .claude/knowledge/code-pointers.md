@@ -65,3 +65,35 @@ cd quickbooks-dataengineering-frontend && npm run dev        # :5173
 - `.github/workflows/frontend-ci.yml` — ESLint + Vite build (on frontend path changes)
 - `.github/workflows/backend-ci.yml` — ruff + pytest with real Postgres (on backend path changes)
 - `.github/workflows/merge-main.yml` — security audits + migration lint + prod build (on push to main)
+
+## Creating stacked PR branches from a single working branch
+
+Use `git checkout <source-branch> -- <files>` to copy specific files onto a new branch without cherry-picking commits:
+
+```bash
+# From each tier (starting on main each time):
+git checkout main
+git checkout -b feat/<name>/<tier>
+git checkout <source-branch> -- file1 file2 dir/
+git add .
+git commit -m "feat(<name>): <tier> layer"
+```
+
+**Gotchas:**
+- All changes on the source branch must be committed before switching — uncommitted changes block `git checkout`
+- Deleted files are NOT carried over by `git checkout -- <files>`; handle them explicitly with `git rm <file>` after creating the branch
+- Return to the original branch with `git checkout <source-branch>` when done
+- Use `git branch --list "feat/<name>/*"` to verify all tiers were created
+
+## Adding a lazy-loaded page route
+
+When adding a new page to `App.tsx`, use `React.lazy()` to keep it out of the main bundle:
+
+```tsx
+const MyPage = lazy(() =>
+  import("@/features/my-feature/MyPage").then((m) => ({ default: m.MyPage })),
+);
+```
+
+Then render inside the existing `<Suspense fallback={null}>` wrapper in `App.tsx`.
+The `.then((m) => ({ default: m.MyPage }))` re-export is required because pages use named exports, not default exports.

@@ -29,3 +29,12 @@ A real DB was chosen after mock tests passed but prod migration failures went un
 
 ## Why the frontend has a `lib/api.ts` abstraction
 All fetch calls are centralized so the base URL (`VITE_API_BASE_URL`) is set in one place, error handling is consistent, and the sync token header is applied uniformly. Raw `fetch` in components would scatter these concerns.
+
+## Why stacked PRs all target main (not each other)
+Chaining PR bases (PR2 targets PR1, PR3 targets PR2) creates a dependency problem: merging PR1 out of order breaks the diff view for all downstream PRs, and GitHub doesn't auto-rebase them. Having every tier branch off main and targeting main independently keeps each PR reviewable in isolation. Reviewers see only the tier's changes, not accumulated diffs. Merge order is documented in the PR body stack table, not enforced by git.
+
+## Why `feat/<feature>/<tier>` branch naming
+Grouping by feature-then-tier (`feat/customer-aging/core`) keeps all branches for a feature visually adjacent in the branch list, makes the stack immediately obvious from the branch name alone, and follows conventional-commits type prefixes so tooling (changelogs, CI filters) can parse them.
+
+## Why `.claude/commands/` and not `.claude/skills/`
+Commands are user-invoked via `/command-name` in the Claude Code prompt — they're explicit, on-demand operations like `/ship` or `/standup`. Skills are auto-triggered by natural language patterns ("implement the spec", "debug this"). Things that should always require deliberate intent (shipping, PR creation, KB updates) belong in commands. Things that improve an ongoing task invisibly belong in skills.

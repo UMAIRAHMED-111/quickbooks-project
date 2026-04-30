@@ -31,5 +31,15 @@ Started as a QuickBooks Online (QBO) data engineering pipeline to sync invoice, 
 - `server.py` updated to bind `0.0.0.0` when `PORT` env var is set (cloud platforms like Render)
 - Defaults to `127.0.0.1` for local runs — security improvement
 
+### 6 — Claude Code workflow infrastructure (`claude-dev`)
+- Full development lifecycle tooling added to `.claude/`:
+  - 7 skills: `spec-creator`, `spec-follower`, `debug`, `refactor`, `feature-request`, `frontend-development`, `split-pr`
+  - 12 commands: `/standup`, `/estimate`, `/new-feature`, `/ship`, `/split-branches`, `/push-stack`, `/check-ci`, `/open-prs`, `/review`, `/docs-standards-review`, `/explain`, `/update-kb`
+  - 7 knowledge files: `workflow.md`, `codebase.md`, `code-pointers.md`, `decisions.md`, `history.md`, `config.md`, `gatekeeping.md`
+  - Hooks: PostToolUse auto-formats `.py` (ruff) and `.ts`/`.tsx` (prettier) with visible `systemMessage` output; Stop hook auto-validates build + tests
+- React.lazy() added to `App.tsx` — page routes are now code-split, main bundle dropped from 776 kB to 289 kB
+- Branch convention established: `feat/<feature>/<tier>` with all tiers targeting main independently
+
 ## Current Branch
 `claude-dev` — active development branch. PRs target `main`.
+Stacked PR branches ready to push: `feat/qbo-dashboard/interface`, `/core`, `/helpers`, `/integration`.
