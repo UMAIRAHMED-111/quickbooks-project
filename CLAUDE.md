@@ -51,6 +51,7 @@ npx prettier --write "src/**/*.{ts,tsx}" && npx prettier --check "src/**/*.{ts,t
 npm run build && npm run lint   # must pass clean — zero type errors, zero lint warnings
 
 # Backend
+ruff check --fix src/ tests/ && ruff format src/ tests/ && ruff check src/ tests/ && ruff format --check src/ tests/
 python -m pytest -q             # must pass — tests run against real Postgres, not mocks
 ```
 

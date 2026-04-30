@@ -34,7 +34,7 @@ PHASE 5 — SHIP
   → /ship command runs all checks and reports pass/fail:
     1. git diff summary
     2. npx prettier --write + --check, then npm run build && npm run lint  (frontend)
-    3. python -m pytest -q           (backend)
+    3. ruff check --fix + format + check + format --check, then python -m pytest -q  (backend)
     4. /docs-standards-review
     5. /review on full diff
     6. /update-kb

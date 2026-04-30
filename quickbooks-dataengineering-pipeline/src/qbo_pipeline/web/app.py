@@ -27,9 +27,7 @@ logger = get_logger(__name__)
 def _database_url() -> str:
     db = os.getenv("SUPABASE_DB_URL") or os.getenv("DATABASE_URL")
     if not db:
-        raise RuntimeError(
-            "Set DATABASE_URL or SUPABASE_DB_URL for the analytics API"
-        )
+        raise RuntimeError("Set DATABASE_URL or SUPABASE_DB_URL for the analytics API")
     return db
 
 
@@ -59,7 +57,9 @@ def _sync_auth_error():
     if auth.lower().startswith("bearer "):
         token = token or auth[7:].strip()
     if token != secret:
-        return jsonify({"error": "unauthorized", "hint": "Set X-Sync-Token or Bearer"}), 401
+        return jsonify(
+            {"error": "unauthorized", "hint": "Set X-Sync-Token or Bearer"}
+        ), 401
     return None
 
 

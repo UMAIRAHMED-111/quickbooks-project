@@ -18,6 +18,10 @@ If frontend files changed:
 ### Step 3 — Backend validation (skip if no backend files changed)
 Detect: `git diff main...HEAD --name-only | grep "^quickbooks-dataengineering-pipeline/"`
 If backend files changed:
+- Run: `cd quickbooks-dataengineering-pipeline && ruff check --fix src/ tests/`
+- Run: `cd quickbooks-dataengineering-pipeline && ruff format src/ tests/`
+- Run: `cd quickbooks-dataengineering-pipeline && ruff check src/ tests/`
+- Run: `cd quickbooks-dataengineering-pipeline && ruff format --check src/ tests/`
 - Run: `cd quickbooks-dataengineering-pipeline && python -m pytest -q`
 - Record: PASS or FAIL with test counts and any failure summary
 
@@ -50,6 +54,7 @@ Changes: <N files, +X -Y lines>
 [ PASS / FAIL ] Frontend prettier
 [ PASS / FAIL ] Frontend build
 [ PASS / FAIL ] Frontend lint
+[ PASS / FAIL ] Backend ruff
 [ PASS / FAIL ] Backend tests  (<N passed, M failed>)
 [ PASS / FAIL ] Docs review    (<N issues / clean>)
 [ PASS / FAIL ] Code review    (<N critical, M warnings>)

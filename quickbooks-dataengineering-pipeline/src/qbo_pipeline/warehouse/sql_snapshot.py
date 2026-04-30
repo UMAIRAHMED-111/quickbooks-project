@@ -123,9 +123,7 @@ def _pack_unpaid_totals(cur: Cursor) -> list[str]:
         "SELECT COALESCE(SUM(balance), 0) FROM public.invoices WHERE balance > 0"
     )
     unpaid_amt = cur.fetchone()[0]
-    lines.append(
-        f"- **Unpaid invoices:** {unpaid_n} (open balance sum ≈ {unpaid_amt})"
-    )
+    lines.append(f"- **Unpaid invoices:** {unpaid_n} (open balance sum ≈ {unpaid_amt})")
     cur.execute(
         "SELECT COUNT(*) FROM public.invoices WHERE balance = 0 OR balance IS NULL"
     )
@@ -137,13 +135,9 @@ def _pack_unpaid_totals(cur: Cursor) -> list[str]:
 
 def _pack_email_status(cur: Cursor) -> list[str]:
     lines: list[str] = []
-    cur.execute(
-        "SELECT COUNT(*) FROM public.invoices WHERE is_email_sent = true"
-    )
+    cur.execute("SELECT COUNT(*) FROM public.invoices WHERE is_email_sent = true")
     lines.append(f"- **Invoices emailed (is_email_sent):** {cur.fetchone()[0]}")
-    cur.execute(
-        "SELECT COUNT(*) FROM public.invoices WHERE is_email_sent = false"
-    )
+    cur.execute("SELECT COUNT(*) FROM public.invoices WHERE is_email_sent = false")
     lines.append(f"- **Invoices not marked email-sent:** {cur.fetchone()[0]}")
     return lines
 

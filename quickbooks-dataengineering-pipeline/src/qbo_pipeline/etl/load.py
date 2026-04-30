@@ -133,7 +133,8 @@ def _upsert_batches(
     one_row = "(" + ", ".join(["%s"] * len(columns)) + ")"
     updates_sql = ", ".join(f"{col} = EXCLUDED.{col}" for col in update_columns)
     changed_sql = " OR ".join(
-        f"public.{table}.{col} IS DISTINCT FROM EXCLUDED.{col}" for col in update_columns
+        f"public.{table}.{col} IS DISTINCT FROM EXCLUDED.{col}"
+        for col in update_columns
     )
     where_sql = f" WHERE ({changed_sql})"
     if freshness_column:
@@ -250,9 +251,9 @@ def _upsert_qbo_bundle(cur: Any, bundle: LoadBundle, chunk: int) -> UpsertStats:
     )
     for qbo_id, db_id in customer_rows:
         customers_by_qbo[str(qbo_id)] = str(db_id)
-    missing_customer_qbo_ids = {
-        str(row["qbo_id"]) for row in bundle.customers
-    } - set(customers_by_qbo.keys())
+    missing_customer_qbo_ids = {str(row["qbo_id"]) for row in bundle.customers} - set(
+        customers_by_qbo.keys()
+    )
     customers_by_qbo.update(
         _fetch_ids_by_qbo(
             cur,
@@ -304,9 +305,9 @@ def _upsert_qbo_bundle(cur: Any, bundle: LoadBundle, chunk: int) -> UpsertStats:
     )
     for qbo_id, db_id in invoice_db_rows:
         invoices_by_qbo[str(qbo_id)] = str(db_id)
-    missing_invoice_qbo_ids = {
-        str(row["qbo_id"]) for row in invoice_rows
-    } - set(invoices_by_qbo.keys())
+    missing_invoice_qbo_ids = {str(row["qbo_id"]) for row in invoice_rows} - set(
+        invoices_by_qbo.keys()
+    )
     invoices_by_qbo.update(
         _fetch_ids_by_qbo(
             cur,
@@ -338,9 +339,9 @@ def _upsert_qbo_bundle(cur: Any, bundle: LoadBundle, chunk: int) -> UpsertStats:
     )
     for qbo_id, db_id in payment_db_rows:
         payments_by_qbo[str(qbo_id)] = str(db_id)
-    missing_payment_qbo_ids = {
-        str(row["qbo_id"]) for row in payment_rows
-    } - set(payments_by_qbo.keys())
+    missing_payment_qbo_ids = {str(row["qbo_id"]) for row in payment_rows} - set(
+        payments_by_qbo.keys()
+    )
     payments_by_qbo.update(
         _fetch_ids_by_qbo(
             cur,

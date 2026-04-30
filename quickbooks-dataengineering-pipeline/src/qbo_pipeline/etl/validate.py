@@ -45,15 +45,22 @@ _QBO_TABLE_SCHEMAS: tuple[_TableSchema, ...] = (
     ),
 )
 
-def _validate_required_and_types(rows: list[dict[str, Any]], schema: _TableSchema) -> None:
+
+def _validate_required_and_types(
+    rows: list[dict[str, Any]], schema: _TableSchema
+) -> None:
     for idx, row in enumerate(rows):
         for field in schema.required_fields:
             value = row.get(field)
             expected_types = schema.field_types.get(field)
             if value is None:
-                raise ValueError(f"{schema.name}[{idx}] missing required field `{field}`")
+                raise ValueError(
+                    f"{schema.name}[{idx}] missing required field `{field}`"
+                )
             if field != "amount" and isinstance(value, str) and not value.strip():
-                raise ValueError(f"{schema.name}[{idx}] missing required field `{field}`")
+                raise ValueError(
+                    f"{schema.name}[{idx}] missing required field `{field}`"
+                )
             if expected_types and not isinstance(value, expected_types):
                 expected = ", ".join(t.__name__ for t in expected_types)
                 raise ValueError(
@@ -67,9 +74,7 @@ def _validate_unique_qbo_ids(rows: list[dict[str, Any]], table_name: str) -> Non
     dups = [qid for qid, count in Counter(qbo_ids).items() if qid and count > 1]
     if dups:
         sample = ", ".join(sorted(dups)[:5])
-        raise ValueError(
-            f"Duplicate `{table_name}.qbo_id` values in payload: {sample}"
-        )
+        raise ValueError(f"Duplicate `{table_name}.qbo_id` values in payload: {sample}")
 
 
 def _validate_referential_integrity(bundle: LoadBundle) -> None:
@@ -81,7 +86,8 @@ def _validate_referential_integrity(bundle: LoadBundle) -> None:
         {
             str(row.get("customer_id"))
             for row in bundle.invoices
-            if row.get("customer_id") and str(row.get("customer_id")) not in customer_ids
+            if row.get("customer_id")
+            and str(row.get("customer_id")) not in customer_ids
         }
     )
     if missing_invoice_customers:
@@ -92,7 +98,8 @@ def _validate_referential_integrity(bundle: LoadBundle) -> None:
         {
             str(row.get("customer_id"))
             for row in bundle.payments
-            if row.get("customer_id") and str(row.get("customer_id")) not in customer_ids
+            if row.get("customer_id")
+            and str(row.get("customer_id")) not in customer_ids
         }
     )
     if missing_payment_customers:
@@ -197,10 +204,12 @@ def _validate_dates_not_in_future(bundle: LoadBundle) -> None:
 
 def _validate_cross_row_consistency(bundle: LoadBundle) -> None:
     payment_total_by_id = {
-        str(row["id"]): float(row.get("total_amount", 0) or 0) for row in bundle.payments
+        str(row["id"]): float(row.get("total_amount", 0) or 0)
+        for row in bundle.payments
     }
     invoice_total_by_id = {
-        str(row["id"]): float(row.get("total_amount", 0) or 0) for row in bundle.invoices
+        str(row["id"]): float(row.get("total_amount", 0) or 0)
+        for row in bundle.invoices
     }
 
     alloc_sum_by_payment: dict[str, float] = {}
@@ -209,8 +218,12 @@ def _validate_cross_row_consistency(bundle: LoadBundle) -> None:
         payment_id = str(row["payment_id"])
         invoice_id = str(row["invoice_id"])
         amount = float(row["amount"])
-        alloc_sum_by_payment[payment_id] = alloc_sum_by_payment.get(payment_id, 0.0) + amount
-        alloc_sum_by_invoice[invoice_id] = alloc_sum_by_invoice.get(invoice_id, 0.0) + amount
+        alloc_sum_by_payment[payment_id] = (
+            alloc_sum_by_payment.get(payment_id, 0.0) + amount
+        )
+        alloc_sum_by_invoice[invoice_id] = (
+            alloc_sum_by_invoice.get(invoice_id, 0.0) + amount
+        )
 
     for payment_id, allocated in alloc_sum_by_payment.items():
         payment_total = payment_total_by_id.get(payment_id, 0.0)

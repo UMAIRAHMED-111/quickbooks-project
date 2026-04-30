@@ -44,10 +44,10 @@ def try_small_talk_reply(question: str) -> str | None:
     if re.fullmatch(r"good\s+(morning|afternoon|evening|day|night)", core):
         return _REPLY_INTRO
 
-    if re.fullmatch(r"(thanks?|thank\s+you|thx|ty|much\s+appreciated)(\s+(!+|you|so\s+much))?", core):
-        return (
-            "You’re welcome! If you need another angle on invoices, payments, or customers, just ask."
-        )
+    if re.fullmatch(
+        r"(thanks?|thank\s+you|thx|ty|much\s+appreciated)(\s+(!+|you|so\s+much))?", core
+    ):
+        return "You’re welcome! If you need another angle on invoices, payments, or customers, just ask."
 
     if re.fullmatch(r"(bye|goodbye|see\s+you|cya|ttyl)(\s+(!+)?)?", core):
         return "Take care! Open this chat anytime you want to explore your QuickBooks numbers."

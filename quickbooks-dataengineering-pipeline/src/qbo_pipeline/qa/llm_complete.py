@@ -120,4 +120,6 @@ def complete_qa_llm(
 
     if last_exc is not None:
         raise last_exc
-    raise RuntimeError("No LLM API keys configured (set OPENAI_API_KEY_1/2 and/or GEMINI_API_KEY)")
+    raise RuntimeError(
+        "No LLM API keys configured (set OPENAI_API_KEY_1/2 and/or GEMINI_API_KEY)"
+    )

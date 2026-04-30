@@ -41,7 +41,7 @@ Rules that protect the project from regressions. These are non-negotiable unless
 ## CI gates (enforced on every PR)
 
 - `frontend-ci`: Prettier check on `src/**/*.{ts,tsx}` + ESLint zero warnings + TypeScript build must pass
-- `backend-ci`: ruff lint + pytest must pass against real Postgres
+- `backend-ci`: ruff check + ruff format --check + pytest must pass against real Postgres
 - `merge-main`: npm audit (high/critical), pip-audit, migration lint, prod build artifact
 
 ## Commit hygiene
