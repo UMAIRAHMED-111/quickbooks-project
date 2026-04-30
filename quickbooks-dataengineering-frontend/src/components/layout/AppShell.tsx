@@ -2,7 +2,9 @@ import {
   FileText,
   LayoutDashboard,
   Loader2,
+  Moon,
   RefreshCw,
+  Sun,
   TrendingUp,
   Users,
 } from "lucide-react";
@@ -14,6 +16,7 @@ import { useSyncMutation } from "@/features/dashboard/hooks/useMetrics";
 import { Button } from "@/components/ui/button";
 import { getErrorMessage } from "@/lib/errorCodes";
 import { cn } from "@/lib/utils";
+import { useThemeStore } from "@/store/theme";
 
 const navItems = [
   { to: "/", label: "Home", icon: LayoutDashboard, end: true },
@@ -25,6 +28,10 @@ const navItems = [
 export function AppShell() {
   const sync = useSyncMutation();
   const [dataEpoch, setDataEpoch] = useState(0);
+  const { resolvedTheme, setTheme } = useThemeStore();
+
+  const handleToggleTheme = () =>
+    setTheme(resolvedTheme === "dark" ? "light" : "dark");
 
   const handleRefresh = () => {
     sync.mutate(undefined, {
@@ -54,34 +61,60 @@ export function AppShell() {
                 QuickBooks snapshot · internal dashboard
               </p>
             </div>
-            <Button
-              type="button"
-              variant="default"
-              size="lg"
-              disabled={sync.isPending}
-              data-loading={sync.isPending ? true : undefined}
-              aria-busy={sync.isPending}
-              aria-label={
-                sync.isPending
-                  ? "Refreshing warehouse data"
-                  : "Refresh warehouse data"
-              }
-              onClick={handleRefresh}
-              className={cn(
-                "min-h-10 min-w-[158px] shrink-0 gap-2 px-4 font-semibold",
-                sync.isPending &&
-                  "shadow-inner ring-2 ring-primary-foreground/20",
-              )}
-            >
-              {sync.isPending ? (
-                <Loader2 className="size-4 shrink-0 animate-spin" aria-hidden />
-              ) : (
-                <RefreshCw className="size-4 shrink-0" aria-hidden />
-              )}
-              <span className="tabular-nums">
-                {sync.isPending ? "Refreshing…" : "Refresh data"}
-              </span>
-            </Button>
+            <div className="flex shrink-0 items-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="lg"
+                onClick={handleToggleTheme}
+                aria-label={
+                  resolvedTheme === "dark"
+                    ? "Switch to light mode"
+                    : "Switch to dark mode"
+                }
+                className="gap-2 px-4 font-semibold"
+              >
+                {resolvedTheme === "dark" ? (
+                  <Sun className="size-4 shrink-0" aria-hidden />
+                ) : (
+                  <Moon className="size-4 shrink-0" aria-hidden />
+                )}
+                <span>
+                  {resolvedTheme === "dark" ? "Light mode" : "Dark mode"}
+                </span>
+              </Button>
+              <Button
+                type="button"
+                variant="default"
+                size="lg"
+                disabled={sync.isPending}
+                data-loading={sync.isPending ? true : undefined}
+                aria-busy={sync.isPending}
+                aria-label={
+                  sync.isPending
+                    ? "Refreshing warehouse data"
+                    : "Refresh warehouse data"
+                }
+                onClick={handleRefresh}
+                className={cn(
+                  "min-h-10 min-w-[158px] gap-2 px-4 font-semibold",
+                  sync.isPending &&
+                    "shadow-inner ring-2 ring-primary-foreground/20",
+                )}
+              >
+                {sync.isPending ? (
+                  <Loader2
+                    className="size-4 shrink-0 animate-spin"
+                    aria-hidden
+                  />
+                ) : (
+                  <RefreshCw className="size-4 shrink-0" aria-hidden />
+                )}
+                <span className="tabular-nums">
+                  {sync.isPending ? "Refreshing…" : "Refresh data"}
+                </span>
+              </Button>
+            </div>
           </div>
 
           <nav

@@ -8,16 +8,14 @@ import {
   YAxis,
 } from "recharts";
 import type { TopOutstandingResponse } from "@/types/metrics";
-import {
-  axisTickStyle,
-  chartGridColor,
-  chartMonoScale,
-} from "@/lib/chart-theme";
+import { useChartTheme } from "@/lib/chart-theme";
 import { formatCurrency, truncateLabel } from "@/lib/format";
 
 type Props = { data: TopOutstandingResponse };
 
 export function TopOutstandingChart({ data }: Props) {
+  const { chartGridColor, axisTickStyle, chartMonoScale, tooltipContentStyle } =
+    useChartTheme();
   const rows = [...(data.customers ?? [])].reverse().map((c) => ({
     ...c,
     shortName: truncateLabel(c.customer_name, 24),
@@ -56,12 +54,7 @@ export function TopOutstandingChart({ data }: Props) {
             const row = payload?.[0]?.payload as { customer_name?: string };
             return row?.customer_name ?? "";
           }}
-          contentStyle={{
-            borderRadius: 8,
-            border: `1px solid ${chartGridColor}`,
-            fontSize: 12,
-            maxWidth: 280,
-          }}
+          contentStyle={{ ...tooltipContentStyle, maxWidth: 280 }}
         />
         <Bar
           dataKey="customer_balance"

@@ -9,17 +9,19 @@ import {
   YAxis,
 } from "recharts";
 import type { PaymentsByMonthResponse } from "@/types/metrics";
-import {
-  axisTickStyle,
-  chartGridColor,
-  chartMonoScale,
-  defaultChartMargin,
-} from "@/lib/chart-theme";
+import { useChartTheme } from "@/lib/chart-theme";
 import { formatCurrency, formatInteger } from "@/lib/format";
 
 type Props = { data: PaymentsByMonthResponse };
 
 export function PaymentsByMonthChart({ data }: Props) {
+  const {
+    chartGridColor,
+    axisTickStyle,
+    chartMonoScale,
+    defaultChartMargin,
+    tooltipContentStyle,
+  } = useChartTheme();
   const series = data.series ?? [];
   if (series.length === 0) return null;
 
@@ -55,11 +57,7 @@ export function PaymentsByMonthChart({ data }: Props) {
               ? formatCurrency(Number(value ?? 0))
               : formatInteger(Number(value ?? 0))
           }
-          contentStyle={{
-            borderRadius: 8,
-            border: `1px solid ${chartGridColor}`,
-            fontSize: 12,
-          }}
+          contentStyle={tooltipContentStyle}
         />
         <Area
           yAxisId="left"

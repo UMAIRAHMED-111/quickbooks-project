@@ -10,17 +10,19 @@ import {
 } from "recharts";
 import { SquarePlotFrame } from "@/components/charts/SquarePlotFrame";
 import type { PaidOnTimeVsLateResponse } from "@/types/metrics";
-import {
-  axisTickStyle,
-  chartGridColor,
-  chartMonoScale,
-  defaultChartMargin,
-} from "@/lib/chart-theme";
+import { useChartTheme } from "@/lib/chart-theme";
 import { formatInteger } from "@/lib/format";
 
 type Props = { data: PaidOnTimeVsLateResponse; variant?: "default" | "grid" };
 
 export function PaidOnTimeVsLateChart({ data, variant = "default" }: Props) {
+  const {
+    chartGridColor,
+    axisTickStyle,
+    chartMonoScale,
+    defaultChartMargin,
+    tooltipContentStyle,
+  } = useChartTheme();
   const chartData = [
     { label: "On time", count: data.paid_on_time_count },
     { label: "Late", count: data.paid_late_count },
@@ -54,11 +56,7 @@ export function PaidOnTimeVsLateChart({ data, variant = "default" }: Props) {
       />
       <Tooltip
         formatter={(value) => formatInteger(Number(value ?? 0))}
-        contentStyle={{
-          borderRadius: 8,
-          border: `1px solid ${chartGridColor}`,
-          fontSize: 11,
-        }}
+        contentStyle={tooltipContentStyle}
       />
       <Bar dataKey="count" radius={[6, 6, 0, 0]}>
         {chartData.map((_, i) => (

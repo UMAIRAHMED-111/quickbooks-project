@@ -1,14 +1,15 @@
 import { Cell, Legend, Pie, PieChart, Tooltip } from "recharts";
 import type { OverdueVsCurrentResponse } from "@/types/metrics";
 import { SquarePlotFrame } from "@/components/charts/SquarePlotFrame";
-import { chartDualMonochrome } from "@/lib/chart-theme";
+import { useChartTheme } from "@/lib/chart-theme";
 import { formatCurrency, formatInteger } from "@/lib/format";
-
-const COLORS = [chartDualMonochrome.ink, chartDualMonochrome.inkMuted];
 
 type Props = { data: OverdueVsCurrentResponse };
 
 export function OverdueVsCurrentChart({ data }: Props) {
+  const { chartDualMonochrome, tooltipContentStyle } = useChartTheme();
+  const COLORS = [chartDualMonochrome.ink, chartDualMonochrome.inkMuted];
+
   const overdue =
     data.overdue_unpaid_count ??
     (data as { overdue_count?: number }).overdue_count ??
@@ -58,11 +59,7 @@ export function OverdueVsCurrentChart({ data }: Props) {
           </Pie>
           <Tooltip
             formatter={(value) => formatInteger(Number(value ?? 0))}
-            contentStyle={{
-              borderRadius: 8,
-              border: "1px solid #e5e7eb",
-              fontSize: 11,
-            }}
+            contentStyle={tooltipContentStyle}
           />
           <Legend
             verticalAlign="bottom"

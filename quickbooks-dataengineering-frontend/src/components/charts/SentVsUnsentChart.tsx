@@ -10,12 +10,7 @@ import {
 } from "recharts";
 import { SquarePlotFrame } from "@/components/charts/SquarePlotFrame";
 import type { SentVsUnsentResponse } from "@/types/metrics";
-import {
-  axisTickStyle,
-  chartDualMonochrome,
-  chartGridColor,
-  defaultChartMargin,
-} from "@/lib/chart-theme";
+import { useChartTheme } from "@/lib/chart-theme";
 import { formatCurrency, formatInteger } from "@/lib/format";
 
 type Props = { data: SentVsUnsentResponse; variant?: "default" | "grid" };
@@ -27,11 +22,6 @@ type BucketRow = {
   sum_total_amount: number;
   sum_open_balance: number;
 };
-
-/** Email sent = black, not sent = dark purple (favicon-aligned). */
-function barFillForBucket(email_sent: boolean) {
-  return email_sent ? chartDualMonochrome.ink : chartDualMonochrome.inkMuted;
-}
 
 function SentVsUnsentTooltip({
   active,
@@ -63,6 +53,13 @@ function SentVsUnsentTooltip({
 }
 
 export function SentVsUnsentChart({ data, variant = "default" }: Props) {
+  const {
+    chartGridColor,
+    axisTickStyle,
+    chartDualMonochrome,
+    defaultChartMargin,
+  } = useChartTheme();
+
   const chartData: BucketRow[] = (data.buckets ?? []).map((b) => ({
     label: b.email_sent ? "Email sent" : "Not sent",
     email_sent: b.email_sent,
@@ -98,7 +95,11 @@ export function SentVsUnsentChart({ data, variant = "default" }: Props) {
         {chartData.map((row, i) => (
           <Cell
             key={`${row.email_sent}-${i}`}
-            fill={barFillForBucket(row.email_sent)}
+            fill={
+              row.email_sent
+                ? chartDualMonochrome.ink
+                : chartDualMonochrome.inkMuted
+            }
           />
         ))}
       </Bar>

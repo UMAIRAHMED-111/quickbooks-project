@@ -9,17 +9,19 @@ import {
   YAxis,
 } from "recharts";
 import type { BestOnTimeResponse } from "@/types/metrics";
-import {
-  axisTickStyle,
-  chartGridColor,
-  chartMonoScale,
-  defaultChartMargin,
-} from "@/lib/chart-theme";
+import { useChartTheme } from "@/lib/chart-theme";
 import { formatInteger, truncateLabel } from "@/lib/format";
 
 type Props = { data: BestOnTimeResponse };
 
 export function BestOnTimePayersChart({ data }: Props) {
+  const {
+    chartGridColor,
+    axisTickStyle,
+    chartMonoScale,
+    defaultChartMargin,
+    tooltipContentStyle,
+  } = useChartTheme();
   const chartData = (data.customers ?? []).map((c) => ({
     name: truncateLabel(c.customer_name, 14),
     fullName: c.customer_name,
@@ -57,12 +59,7 @@ export function BestOnTimePayersChart({ data }: Props) {
             const row = payload?.[0]?.payload as { fullName?: string };
             return row?.fullName ?? "";
           }}
-          contentStyle={{
-            borderRadius: 8,
-            border: `1px solid ${chartGridColor}`,
-            fontSize: 12,
-            maxWidth: 300,
-          }}
+          contentStyle={{ ...tooltipContentStyle, maxWidth: 300 }}
         />
         <Legend />
         <Bar

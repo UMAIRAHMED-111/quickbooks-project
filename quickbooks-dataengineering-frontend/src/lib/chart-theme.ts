@@ -1,4 +1,5 @@
 /** Shared Recharts styling — white plot, light grid, readable axes (FRONTEND.md §6). */
+import { useThemeStore } from "@/store/theme";
 
 /** Legacy categorical palette (prefer chartMonoScale for new work). */
 export const chartPalette = {
@@ -51,3 +52,43 @@ export const axisLabelStyle = {
   fontSize: 12,
   fontWeight: 500,
 } as const;
+
+export const tooltipContentStyle = {
+  borderRadius: 8,
+  border: "1px solid #e5e7eb",
+  fontSize: 12,
+} as const;
+
+export function useChartTheme() {
+  const resolvedTheme = useThemeStore((s) => s.resolvedTheme);
+  const dark = resolvedTheme === "dark";
+  return {
+    chartGridColor: dark ? "#374151" : "#e5e7eb",
+    axisTickStyle: dark
+      ? ({ fill: "#9ca3af", fontSize: 10 } as const)
+      : axisTickStyle,
+    axisLabelStyle: dark
+      ? ({ fill: "#d1d5db", fontSize: 12, fontWeight: 500 } as const)
+      : axisLabelStyle,
+    chartMonoScale: dark
+      ? ({ ink: "#f9fafb", inkMuted: "#a78bfa", inkLight: "#c4b5fd" } as const)
+      : chartMonoScale,
+    chartDualMonochrome: dark
+      ? ({ ink: "#f9fafb", inkMuted: "#a78bfa" } as const)
+      : chartDualMonochrome,
+    defaultChartMargin,
+    tooltipContentStyle: dark
+      ? ({
+          borderRadius: 8,
+          border: "1px solid #374151",
+          backgroundColor: "#1f2937",
+          color: "#f9fafb",
+          fontSize: 12,
+        } as const)
+      : ({
+          borderRadius: 8,
+          border: "1px solid #e5e7eb",
+          fontSize: 12,
+        } as const),
+  };
+}

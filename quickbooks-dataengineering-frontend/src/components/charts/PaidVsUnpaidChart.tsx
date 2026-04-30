@@ -1,15 +1,16 @@
 import { Cell, Legend, Pie, PieChart, Tooltip } from "recharts";
 import type { PaidVsUnpaidResponse } from "@/types/metrics";
 import { SquarePlotFrame } from "@/components/charts/SquarePlotFrame";
-import { chartDualMonochrome } from "@/lib/chart-theme";
+import { useChartTheme } from "@/lib/chart-theme";
 import { formatCurrency, formatInteger } from "@/lib/format";
 import { cn } from "@/lib/utils";
-
-const COLORS = [chartDualMonochrome.ink, chartDualMonochrome.inkMuted];
 
 type Props = { data: PaidVsUnpaidResponse };
 
 export function PaidVsUnpaidChart({ data }: Props) {
+  const { chartDualMonochrome, tooltipContentStyle } = useChartTheme();
+  const COLORS = [chartDualMonochrome.ink, chartDualMonochrome.inkMuted];
+
   const pieData = [
     { name: "Paid", value: data.paid_count },
     { name: "Unpaid", value: data.unpaid_count },
@@ -41,11 +42,7 @@ export function PaidVsUnpaidChart({ data }: Props) {
         </Pie>
         <Tooltip
           formatter={(value) => formatInteger(Number(value ?? 0))}
-          contentStyle={{
-            borderRadius: 8,
-            border: "1px solid #e5e7eb",
-            fontSize: 11,
-          }}
+          contentStyle={tooltipContentStyle}
         />
         <Legend
           verticalAlign="bottom"
