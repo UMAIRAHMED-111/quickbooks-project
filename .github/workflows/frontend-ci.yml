@@ -2,6 +2,11 @@ name: Frontend CI
 
 on:
   push:
+    branches:
+      - main
+      - 'feat/**'
+      - 'fix/**'
+      - 'chore/**'
     paths:
       - "quickbooks-dataengineering-frontend/**"
       - ".github/workflows/frontend-ci.yml"

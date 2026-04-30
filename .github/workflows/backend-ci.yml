@@ -2,6 +2,11 @@ name: Backend CI
 
 on:
   push:
+    branches:
+      - main
+      - 'feat/**'
+      - 'fix/**'
+      - 'chore/**'
     paths:
       - "quickbooks-dataengineering-pipeline/**"
       - ".github/workflows/backend-ci.yml"
