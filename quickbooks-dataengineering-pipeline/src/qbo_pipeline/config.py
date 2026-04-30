@@ -60,8 +60,12 @@ class Settings:
         return Settings(
             n8n_webhook_url=_n8n_webhook_url_from_env(),
             supabase_database_url=db,
-            n8n_http_timeout_seconds=float(os.getenv("N8N_HTTP_TIMEOUT_SECONDS", "120")),
-            supabase_insert_chunk_size=int(os.getenv("SUPABASE_INSERT_CHUNK_SIZE", "500")),
+            n8n_http_timeout_seconds=float(
+                os.getenv("N8N_HTTP_TIMEOUT_SECONDS", "120")
+            ),
+            supabase_insert_chunk_size=int(
+                os.getenv("SUPABASE_INSERT_CHUNK_SIZE", "500")
+            ),
             n8n_basic_auth_username=n8n_user,
             n8n_basic_auth_password=n8n_pass,
         )
@@ -90,9 +94,7 @@ class WarehouseQaConfig:
     def from_env() -> WarehouseQaConfig:
         db = os.getenv("SUPABASE_DB_URL") or os.getenv("DATABASE_URL")
         if not db:
-            raise RuntimeError(
-                "Set DATABASE_URL or SUPABASE_DB_URL for warehouse Q&A"
-            )
+            raise RuntimeError("Set DATABASE_URL or SUPABASE_DB_URL for warehouse Q&A")
         k1 = os.getenv("OPENAI_API_KEY_1", "").strip()
         k2 = os.getenv("OPENAI_API_KEY_2", "").strip()
         gem = (
@@ -105,7 +107,9 @@ class WarehouseQaConfig:
                 "(or GOOGLE_API_KEY) for natural-language answers"
             )
         openai_model = os.getenv("OPENAI_MODEL", "gpt-4").strip() or "gpt-4"
-        openai_planner = (os.getenv("OPENAI_PLANNER_MODEL") or "").strip() or openai_model
+        openai_planner = (
+            os.getenv("OPENAI_PLANNER_MODEL") or ""
+        ).strip() or openai_model
         openai_sql = (os.getenv("OPENAI_SQL_MODEL") or "").strip() or openai_model
         # Gemini defaults for fallback (when keys are present or for model strings)
         g_model = os.getenv("GEMINI_MODEL", "gemini-2.5-flash-lite").strip()
@@ -116,9 +120,11 @@ class WarehouseQaConfig:
             "true",
             "yes",
         )
-        use_dynamic_sql = os.getenv(
-            "WAREHOUSE_QA_DYNAMIC_SQL", ""
-        ).strip().lower() in ("1", "true", "yes")
+        use_dynamic_sql = os.getenv("WAREHOUSE_QA_DYNAMIC_SQL", "").strip().lower() in (
+            "1",
+            "true",
+            "yes",
+        )
         try:
             qa_context_max_chars = int(
                 os.getenv("WAREHOUSE_QA_CONTEXT_MAX_CHARS", "12000").strip()

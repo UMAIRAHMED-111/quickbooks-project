@@ -1,0 +1,28 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"/Users/umairahmed/Desktop/Personal Projects/quickbooks-project\" && CHANGED=$(git diff --name-only HEAD 2>/dev/null; git ls-files --others --exclude-standard 2>/dev/null); if echo \"$CHANGED\" | grep -q \"^quickbooks-dataengineering-frontend/\"; then echo \"--- Frontend validation ---\" && cd \"/Users/umairahmed/Desktop/Personal Projects/quickbooks-project/quickbooks-dataengineering-frontend\" && npm run build && npm run lint; fi; if echo \"$CHANGED\" | grep -q \"^quickbooks-dataengineering-pipeline/\"; then echo \"--- Backend validation ---\" && cd \"/Users/umairahmed/Desktop/Personal Projects/quickbooks-project/quickbooks-dataengineering-pipeline\" && python -m pytest -q; fi",
+            "timeout": 120,
+            "statusMessage": "Running post-change validation..."
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path // empty' | { read -r f; if [ -n \"$f\" ]; then case \"$f\" in *.py) ruff format \"$f\" 2>/dev/null && echo \"ruff: formatted $f\" ;; *.ts|*.tsx) cd \"/Users/umairahmed/Desktop/Personal Projects/quickbooks-project/quickbooks-dataengineering-frontend\" && npx prettier --write \"$f\" 2>/dev/null && echo \"prettier: formatted $f\" ;; esac; fi; } || true",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}
