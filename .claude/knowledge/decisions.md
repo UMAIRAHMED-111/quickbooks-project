@@ -36,5 +36,8 @@ Chaining PR bases (PR2 targets PR1, PR3 targets PR2) creates a dependency proble
 ## Why `feat/<feature>/<tier>` branch naming
 Grouping by feature-then-tier (`feat/customer-aging/core`) keeps all branches for a feature visually adjacent in the branch list, makes the stack immediately obvious from the branch name alone, and follows conventional-commits type prefixes so tooling (changelogs, CI filters) can parse them.
 
+## Why `claude-dev` is local-only and never pushed to remote
+`claude-dev` is the rolling integration branch where day-to-day work accumulates. Publishing it to remote creates ambiguity: PRs, CI, and reviewers would need to treat it differently from the structured `feat/<name>/<tier>` branches. Keeping it local avoids that noise. All publishable work flows through the tier branches, which are properly scoped and individually reviewable. When `/push-stack` detects a local-only working branch with unpublished commits, it automatically rebases the tier branches onto that branch tip so the commits are included in what gets pushed — the dev branch itself never needs to go to remote.
+
 ## Why `.claude/commands/` and not `.claude/skills/`
 Commands are user-invoked via `/command-name` in the Claude Code prompt — they're explicit, on-demand operations like `/ship` or `/standup`. Skills are auto-triggered by natural language patterns ("implement the spec", "debug this"). Things that should always require deliberate intent (shipping, PR creation, KB updates) belong in commands. Things that improve an ongoing task invisibly belong in skills.

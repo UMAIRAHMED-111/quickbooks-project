@@ -130,8 +130,13 @@ Omits tiers that have no files.
 
 ### Step 2 — `/push-stack`
 
-Rebases all `feat/<name>/*` branches onto `origin/main`, then pushes to remote.
-Fails loudly on conflicts or rejected pushes. Never force-pushes.
+Rebases all `feat/<name>/*` branches and pushes to remote. Fails loudly on conflicts or rejected pushes. Never force-pushes.
+
+**Before running:** commit any pending changes on the working branch — uncommitted files block the branch checkouts.
+
+**If the working branch is local-only (e.g. `claude-dev`) with unpublished commits:** `/push-stack` detects this and rebases tier branches onto the local branch tip instead of `origin/main`, so those commits are carried into the published branches. The local dev branch itself is not pushed.
+
+**Duplicate-commit drops are expected:** if the tier branch's specific commit was already present on the dev branch (i.e. the work landed on `claude-dev` before `/split-branches` ran), git silently drops it during rebase. All 4 tier branches end up identical to the dev branch tip. This is Option A — the code is correct, each PR will show the full diff against main rather than a tier-scoped slice.
 
 ### Step 3 — `/check-ci`
 
